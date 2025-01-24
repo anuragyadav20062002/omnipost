@@ -1,0 +1,21 @@
+name = "omnipost-scheduler"
+main = "src/index.ts"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+NEXT_PUBLIC_SUPABASE_URL = "https://efiydlwnbhdcokttfifz.supabase.co"
+NEXT_PUBLIC_APP_URL = "http://localhost:3000"
+TWITTER_CLIENT_ID = "QWZOaFQxeXB6UVM0TkFvRkhqSE46MTpjaQ"
+TWITTER_CLIENT_SECRET = "6S_8DvYwJ92kyN9p1rL0FukDo0FsZBk7BI37F85e3CZCaj68Iz"
+
+# D1 Database
+[[d1_databases]]
+binding = "DB"
+database_name = "omnipost_scheduler"
+database_id = "d8d20a86-e7f6-4a49-bdd8-14a720cc131f"
+
+# Add this section for the cron trigger
+[triggers]
+crons = ["*/5 * * * *"]  # This runs every 5 minutes
+

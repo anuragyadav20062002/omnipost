@@ -1,0 +1,37 @@
+@keyframes sparkle {
+    0%, 100% { opacity: 0; transform: scale(0.5) rotate(0deg); }
+    50% { opacity: 1; transform: scale(1) rotate(180deg); }
+  }
+  
+  @keyframes burst {
+    0% { transform: scale(0); opacity: 0; }
+    50% { transform: scale(1.2); opacity: 1; }
+    100% { transform: scale(1); opacity: 0; }
+  }
+  
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+  }
+  
+  .sparkle {
+    position: absolute;
+    pointer-events: none;
+  }
+  
+  .sparkle-1 { animation: sparkle 1s ease-in-out infinite, float 3s ease-in-out infinite; }
+  .sparkle-2 { animation: sparkle 1.2s ease-in-out 0.2s infinite, float 2.5s ease-in-out infinite; }
+  .sparkle-3 { animation: sparkle 0.8s ease-in-out 0.4s infinite, float 3.5s ease-in-out infinite; }
+  .sparkle-4 { animation: sparkle 1.5s ease-in-out 0.6s infinite, float 3s ease-in-out infinite; }
+  
+  .burst {
+    position: absolute;
+    pointer-events: none;
+    opacity: 0;
+  }
+  
+  .burst-1 { animation: burst 1.5s ease-out infinite; }
+  .burst-2 { animation: burst 1.5s ease-out 0.5s infinite; }
+  .burst-3 { animation: burst 1.5s ease-out 1s infinite; }
+  
+  

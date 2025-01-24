@@ -1,0 +1,19 @@
+{
+  "name": "omnipost-worker",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@hono/node-server": "^1.13.7",
+    "hono": "^4.6.16"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250109.0"
+  }
+}
