@@ -1,5 +1,4 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { cookies } from "next/headers"
 import { getAuthUrl } from "@/lib/social-media/oauth"
 
 export async function GET(request: NextRequest, { params }: { params: { platform: string } }) {

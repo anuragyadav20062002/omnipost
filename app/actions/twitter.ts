@@ -7,9 +7,6 @@ import { Database } from '@/types/database'
 import { SocialMediaToken } from '@/types/social-media'
 import { checkRateLimit, updateRateLimit } from '@/lib/rate-limiter'
 
-interface TwitterMediaUploadResult {
-  media_id_string: string;
-}
 
 export async function publishTweetAction(content: string, imageUrl?: string) {
   const supabase = createServerActionClient<Database>({ cookies })

@@ -2,13 +2,12 @@
 
 import { useState } from 'react'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
-import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { FcGoogle } from 'react-icons/fc'
 
 export default function SignIn() {
   const [error, setError] = useState<string | null>(null)
-  const router = useRouter()
+
   const supabase = createClientComponentClient()
 
   const handleGoogleSignIn = async () => {
