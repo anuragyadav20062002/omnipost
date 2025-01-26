@@ -35,7 +35,7 @@ export function UserGuide() {
       <GuideSection title="Repurposing Content">
         <p className="mb-2">Learn how to transform your long-form content into platform-specific posts:</p>
         <ol className="list-decimal list-inside space-y-2 ml-4">
-          <li>Navigate to the 'Repurpose' page from the dashboard.</li>
+          <li>Navigate to the &apos;Repurpose&apos; page from the dashboard.</li>
           <li>Paste your long-form content or upload a file.</li>
           <li>Select the social media platforms you want to create content for.</li>
           <li>
@@ -45,7 +45,7 @@ export function UserGuide() {
             </TermTooltip>{" "}
             and content length.
           </li>
-          <li>Click 'Repurpose' and wait for the AI to generate your posts.</li>
+          <li>Click &apos;Repurpose&apos; and wait for the AI to generate your posts.</li>
           <li>Review and edit the generated content as needed.</li>
         </ol>
       </GuideSection>
@@ -63,8 +63,8 @@ export function UserGuide() {
         </p>
         <ul className="list-disc list-inside space-y-2 ml-4">
           <li>View all your repurposed content in one place.</li>
-          <li>Edit drafts by clicking on the 'Edit' button.</li>
-          <li>Delete unwanted drafts using the 'Delete' button.</li>
+          <li>Edit drafts by clicking on the &apos;Edit&apos; button.</li>
+          <li>Delete unwanted drafts using the &apos;Delete&apos; button.</li>
           <li>Schedule posts directly from the History page.</li>
         </ul>
       </GuideSection>
@@ -82,7 +82,7 @@ export function UserGuide() {
           </li>
           <li>Choose the social media platform for the post.</li>
           <li>Review the content one last time.</li>
-          <li>Click 'Schedule' to confirm.</li>
+          <li>Click &apos;Schedule&apos; to confirm.</li>
         </ol>
         <p className="mt-4 mb-2">
           Remember, all scheduled times are in UTC. Use the widget below to check the current UTC time:
@@ -159,7 +159,7 @@ export function UserGuide() {
           </li>
         </ul>
         <p className="mt-4">
-          If a post fails to publish, you'll receive a{" "}
+          If a post fails to publish, you&apos;ll receive a{" "}
           <TermTooltip term="Notification" definition="An alert or message informing you about important events">
             notification
           </TermTooltip>
