@@ -1,17 +1,10 @@
-import Link from "next/link"
-import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import {
   ArrowRight,
   Zap,
   Calendar,
   BarChart,
-  Share2,
-  Repeat,
-  Users,
-  Shield,
   ChevronRight,
-  Check,
   Twitter,
   Facebook,
   Instagram,

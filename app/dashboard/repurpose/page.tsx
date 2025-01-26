@@ -11,7 +11,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useToast } from "@/hooks/use-toast"
-import { Loader2, Upload, LinkIcon, FileText, ImageIcon, Sparkles } from 'lucide-react'
+import { Loader2, LinkIcon, FileText, ImageIcon, Sparkles } from 'lucide-react'
 import type { Database } from "@/types/database"
 import { PlatformPreviews } from '@/components/PlatformPreviews'
 import { getUserUsage, incrementUsage, type UsageTracking } from "@/lib/usage-tracking"

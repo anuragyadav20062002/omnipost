@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { createHash, randomBytes } from 'crypto';
+import { randomBytes } from 'crypto';
 
 interface OAuthConfig {
   clientId: string;
@@ -11,13 +11,7 @@ interface OAuthConfig {
   usesPKCE?: boolean;
 }
 
-interface TokenResponse {
-  access_token: string;
-  refresh_token?: string;
-  expires_in: number;
-  token_type: string;
-  user_id?: string;
-}
+
 
 interface FacebookPageData {
   access_token: string;
@@ -336,39 +330,39 @@ export async function handleCallback(
   }
 }
 
-async function refreshTwitterToken(refreshToken: string): Promise<string> {
-  const config = configs.twitter;
-  const tokenUrl = 'https://api.twitter.com/2/oauth2/token';
-  const basicAuth = Buffer.from(`${config.clientId}:${config.clientSecret}`).toString('base64');
+// async function refreshTwitterToken(refreshToken: string): Promise<string> {
+//   const config = configs.twitter;
+//   const tokenUrl = 'https://api.twitter.com/2/oauth2/token';
+//   const basicAuth = Buffer.from(`${config.clientId}:${config.clientSecret}`).toString('base64');
 
-  const response = await fetch(tokenUrl, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Basic ${basicAuth}`,
-      'Content-Type': 'application/x-www-form-urlencoded'
-    },
-    body: new URLSearchParams({
-      grant_type: 'refresh_token',
-      refresh_token: refreshToken
-    })
-  });
+//   const response = await fetch(tokenUrl, {
+//     method: 'POST',
+//     headers: {
+//       'Authorization': `Basic ${basicAuth}`,
+//       'Content-Type': 'application/x-www-form-urlencoded'
+//     },
+//     body: new URLSearchParams({
+//       grant_type: 'refresh_token',
+//       refresh_token: refreshToken
+//     })
+//   });
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    console.error('Twitter token refresh error:', errorText);
-    throw new Error(`Twitter token refresh error: ${errorText}`);
-  }
+//   if (!response.ok) {
+//     const errorText = await response.text();
+//     console.error('Twitter token refresh error:', errorText);
+//     throw new Error(`Twitter token refresh error: ${errorText}`);
+//   }
 
-  const data = await response.json();
-  if (!data.access_token) {
-    throw new Error('No access token received from Twitter');
-  }
+//   const data = await response.json();
+//   if (!data.access_token) {
+//     throw new Error('No access token received from Twitter');
+//   }
 
-  // Verify the refreshed token has the correct scopes
-  const scopes = data.scope.split(' ');
-  if (!scopes.includes('tweet.write')) {
-    throw new Error('Refreshed Twitter token does not have tweet.write permission');
-  }
+//   // Verify the refreshed token has the correct scopes
+//   const scopes = data.scope.split(' ');
+//   if (!scopes.includes('tweet.write')) {
+//     throw new Error('Refreshed Twitter token does not have tweet.write permission');
+//   }
 
-  return data.access_token;
-}
+//   return data.access_token;
+// }

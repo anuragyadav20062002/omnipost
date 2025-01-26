@@ -41,8 +41,6 @@ interface DashboardClientProps {
 }
 
 export default function DashboardClient({
-  user,
-  profile,
   usage,
   planType,
   planLimits,

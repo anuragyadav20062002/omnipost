@@ -2,7 +2,6 @@ import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
 import { cookies } from "next/headers"
 import type { Database } from "@/types/database"
 import DashboardClient from "./DashboardClient"
-import { checkAndPublishDuePosts } from "@/lib/social-media/publish"
 import { redirect } from "next/navigation"
 
 export default async function Dashboard() {

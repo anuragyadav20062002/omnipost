@@ -190,28 +190,6 @@ export default function SocialAccountsPage() {
     }
   }
 
-  const connectInstagram = async () => {
-    setIsLoading(true);
-    try {
-      const response = await fetch('/api/auth/instagram');
-      const data = await response.json();
-
-      if (data.error) {
-        throw new Error(data.error);
-      }
-
-      window.location.href = data.url;
-    } catch (error) {
-      console.error('Error connecting Instagram account:', error);
-      toast({
-        title: "Error",
-        description: `Failed to connect Instagram account. ${error}`,
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   return (
     <div className="container mx-auto py-10">

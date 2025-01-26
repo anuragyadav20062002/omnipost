@@ -8,12 +8,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { useToast } from "@/hooks/use-toast"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Info, Calendar } from 'lucide-react'
-import { ChartContainer, ChartTooltip } from "@/components/ui/chart"
+import { Info } from 'lucide-react'
 import { Bar, BarChart, Line, LineChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend } from "recharts"
 import { CustomTable } from '@/components/ui/custom-table'
 import { DatePickerWithRange } from '@/components/ui/date-range-picker'
-import { addDays, format } from 'date-fns'
+import { addDays } from 'date-fns'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 interface AnalyticsData {

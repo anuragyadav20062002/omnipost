@@ -12,7 +12,6 @@ export default function SubscriptionPage() {
   const [currentPlan, setCurrentPlan] = useState<'basic' | 'pro' | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const supabase = createClientComponentClient<Database>()
-  const router = useRouter()
   const { toast } = useToast()
 
   useEffect(() => {

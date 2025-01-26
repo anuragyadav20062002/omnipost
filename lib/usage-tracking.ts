@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase"
-import { Database } from "@/types/database"
+
 
 type SubscriptionPlan = "basic" | "pro"
 

@@ -11,7 +11,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { SchedulePosts } from "@/components/SchedulePosts"
 import type { Database } from "@/types/database"
 import { schedulePost } from "@/lib/social-media/scheduler"
-import { checkAndPublishDuePosts } from "@/lib/social-media/publish"
 import { PlatformPreviews } from "@/components/PlatformPreviews"
 import { motion, AnimatePresence } from "framer-motion"
 

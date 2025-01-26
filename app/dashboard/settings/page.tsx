@@ -19,7 +19,6 @@ export default function SettingsPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [profile, setProfile] = useState<any>(null)
   const supabase = createClientComponentClient<Database>()
-  const router = useRouter()
   const { toast } = useToast()
 
   useEffect(() => {
