@@ -72,7 +72,7 @@ export function UserGuide() {
       <GuideSection title="Scheduling Posts">
         <p className="mb-2">To schedule your posts:</p>
         <ol className="list-decimal list-inside space-y-2 ml-4">
-          <li>Go to the 'Schedule' page or click 'Schedule' on a draft in the History page.</li>
+          <li>Go to the &apos;Schedule&apos; page or click &apos;Schedule&apos; on a draft in the History page.</li>
           <li>
             Select the{" "}
             <TermTooltip term="UTC" definition="Coordinated Universal Time, the primary time standard used worldwide">
