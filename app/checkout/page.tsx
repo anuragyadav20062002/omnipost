@@ -48,7 +48,7 @@ export default function Checkout() {
         <div className="text-center">
           <h2 className="mt-6 text-3xl font-extrabold gradient-text">Complete Your Subscription</h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            You're almost there! Click the button below to complete your subscription on Whop.
+            You&apos;re almost there! Click the button below to complete your subscription on Whop.
           </p>
         </div>
         <Button
