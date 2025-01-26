@@ -44,7 +44,7 @@ export async function POST(request: Request) {
 
   if (file) {
     const fileName = `${uuidv4()}-${file.name}`
-    const { data, error } = await supabase.storage
+    const { error } = await supabase.storage
       .from('temp-uploads')
       .upload(fileName, file)
 
