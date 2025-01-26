@@ -38,7 +38,26 @@ interface AnalyticsData {
   }[]
 }
 
-const contentGenerationColumns: any[] = [
+// Define types for post and scheduled post
+interface Post {
+  created_at: string;
+  content: string;
+}
+
+interface ScheduledPost {
+  scheduled_for: string;
+  status: 'published' | 'failed' | 'pending';
+  platform: string;
+  metadata?: {
+    engagement?: {
+      likes: number;
+      comments: number;
+      shares: number;
+    }
+  }
+}
+
+const contentGenerationColumns: { accessorKey: keyof AnalyticsData['contentGeneration'][0], header: string }[] = [
   {
     accessorKey: "date",
     header: "Date",
@@ -65,7 +84,7 @@ const contentGenerationColumns: any[] = [
   },
 ]
 
-const publishingColumns: any[] = [
+const publishingColumns: { accessorKey: keyof AnalyticsData['publishing'][0], header: string }[] = [
   {
     accessorKey: "date",
     header: "Date",
@@ -84,7 +103,7 @@ const publishingColumns: any[] = [
   },
 ]
 
-const engagementColumns: any[] = [
+const engagementColumns: { accessorKey: keyof AnalyticsData['engagement'][0], header: string }[] = [
   {
     accessorKey: "platform",
     header: "Platform",
@@ -117,10 +136,6 @@ export default function AnalyticsDashboard() {
   const [selectedMetric, setSelectedMetric] = useState<string>("total")
   const supabase = createClientComponentClient<Database>()
   const { toast } = useToast()
-
-  useEffect(() => {
-    fetchAnalytics()
-  }, [dateRange])
 
   const fetchAnalytics = async () => {
     setIsLoading(true)
@@ -172,7 +187,11 @@ export default function AnalyticsDashboard() {
     }
   }
 
-  const processContentGenerationData = (posts: any[]) => {
+  useEffect(() => {
+    fetchAnalytics()
+  }, [dateRange, fetchAnalytics])
+
+  const processContentGenerationData = (posts: Post[]) => {
     const dateMap = new Map()
 
     posts.forEach(post => {
@@ -201,7 +220,7 @@ export default function AnalyticsDashboard() {
     return Array.from(dateMap.values())
   }
 
-  const processPublishingData = (scheduledPosts: any[]) => {
+  const processPublishingData = (scheduledPosts: ScheduledPost[]) => {
     const dateMap = new Map()
 
     scheduledPosts.forEach(post => {
@@ -223,7 +242,7 @@ export default function AnalyticsDashboard() {
     return Array.from(dateMap.values())
   }
 
-  const processEngagementData = (scheduledPosts: any[]) => {
+  const processEngagementData = (scheduledPosts: ScheduledPost[]) => {
     const platformMap = new Map()
 
     scheduledPosts.forEach(post => {
