@@ -131,7 +131,7 @@ export default function Home() {
               <div className="space-y-4">
                 <h3 className="text-2xl font-semibold">Optimize Your Posting Schedule</h3>
                 <p className="text-lg">
-                  OmniPost's smart scheduling feature ensures your content reaches your audience at the perfect time:
+                  OmniPost&apos;s smart scheduling feature ensures your content reaches your audience at the perfect time:
                 </p>
                 <ul className="space-y-2">
                   <li className="flex items-center">
@@ -269,7 +269,7 @@ export default function Home() {
                 <Card key={index} className="flex flex-col">
                   <CardContent className="flex-grow flex flex-col justify-between p-6">
                     <blockquote className="text-lg italic mb-4 flex-grow text-foreground">
-                      "{testimonial.quote}"
+                      &quot;{testimonial.quote}&quot;
                     </blockquote>
                     <div className="flex items-center mt-4">
                       <Avatar className="h-12 w-12 mr-4">
@@ -308,7 +308,7 @@ export default function Home() {
               <AccordionItem value="item-2">
                 <AccordionTrigger>Which social media platforms does OmniPost support?</AccordionTrigger>
                 <AccordionContent>
-                  OmniPost currently supports Twitter, Facebook, Instagram, and LinkedIn. We're working on adding
+                  OmniPost currently supports Twitter, Facebook, Instagram, and LinkedIn. We&apos;re working on adding
                   support for TikTok, Pinterest, YouTube, and Medium in the near future.
                 </AccordionContent>
               </AccordionItem>
