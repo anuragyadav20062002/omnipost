@@ -12,7 +12,7 @@ interface PlatformBreakdownChartProps {
 
 export function PlatformBreakdownChart({ data }: PlatformBreakdownChartProps) {
   // Process the data to get post count by platform
-  const processedData = data.reduce((acc: any, item: any) => {
+  const processedData = data.reduce((acc: { [key: string]: { name: string; value: number } }, item: PlatformData) => {
     const platform = item.platform
     if (!acc[platform]) {
       acc[platform] = { name: platform, value: 0 }
@@ -37,7 +37,7 @@ export function PlatformBreakdownChart({ data }: PlatformBreakdownChartProps) {
           fill="#8884d8"
           dataKey="value"
         >
-          {chartData.map((entry: any, index: number) => (
+          {chartData.map((entry: { name: string; value: number }, index: number) => (
             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
           ))}
         </Pie>

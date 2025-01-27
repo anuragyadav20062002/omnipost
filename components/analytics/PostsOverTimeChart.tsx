@@ -1,12 +1,12 @@
 import { Line, LineChart, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 
 interface PostsOverTimeChartProps {
-  data: any[]
+  data: Array<{ created_at: string }>
 }
 
 export function PostsOverTimeChart({ data }: PostsOverTimeChartProps) {
   // Process the data to get posts count over time
-  const processedData = data.reduce((acc: any[], item: any) => {
+  const processedData = data.reduce((acc: Array<{ date: string; count: number }>, item: { created_at: string }) => {
     const date = new Date(item.created_at).toLocaleDateString()
     const existingEntry = acc.find(entry => entry.date === date)
     if (existingEntry) {
