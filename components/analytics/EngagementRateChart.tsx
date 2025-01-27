@@ -1,10 +1,16 @@
 import { Bar, BarChart, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 
-interface EngagementRateChartProps {
-  data: any[]
+// Define specific types for the props and data
+interface EngagementData {
+  date: string;
+  engagementRate: number;
 }
 
-export function EngagementRateChart({ data }: EngagementRateChartProps) {
+interface EngagementRateChartProps {
+  data: EngagementData[];
+}
+
+const EngagementRateChart: React.FC<EngagementRateChartProps> = ({ data }) => {
   // Process the data to get engagement rate by platform
   const processedData = data.reduce((acc: any, item: any) => {
     const platform = item.platform
@@ -34,4 +40,6 @@ export function EngagementRateChart({ data }: EngagementRateChartProps) {
     </ResponsiveContainer>
   )
 }
+
+export default EngagementRateChart;
 

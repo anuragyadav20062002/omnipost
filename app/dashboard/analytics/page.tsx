@@ -38,7 +38,26 @@ interface AnalyticsData {
   }[]
 }
 
-const contentGenerationColumns: any[] = [
+// Define specific types for the data structures
+interface Post {
+  created_at: string;
+  content: string;
+}
+
+interface ScheduledPost {
+  scheduled_for: string;
+  status: 'published' | 'failed' | 'pending';
+  platform: string;
+  metadata?: {
+    engagement?: {
+      likes: number;
+      comments: number;
+      shares: number;
+    }
+  }
+}
+
+const contentGenerationColumns: { accessorKey: string; header: string }[] = [
   {
     accessorKey: "date",
     header: "Date",
@@ -65,7 +84,7 @@ const contentGenerationColumns: any[] = [
   },
 ]
 
-const publishingColumns: any[] = [
+const publishingColumns: { accessorKey: string; header: string }[] = [
   {
     accessorKey: "date",
     header: "Date",
@@ -84,7 +103,7 @@ const publishingColumns: any[] = [
   },
 ]
 
-const engagementColumns: any[] = [
+const engagementColumns: { accessorKey: string; header: string }[] = [
   {
     accessorKey: "platform",
     header: "Platform",
@@ -172,7 +191,7 @@ export default function AnalyticsDashboard() {
     }
   }
 
-  const processContentGenerationData = (posts: any[]) => {
+  const processContentGenerationData = (posts: Post[]) => {
     const dateMap = new Map()
 
     posts.forEach(post => {
@@ -201,7 +220,7 @@ export default function AnalyticsDashboard() {
     return Array.from(dateMap.values())
   }
 
-  const processPublishingData = (scheduledPosts: any[]) => {
+  const processPublishingData = (scheduledPosts: ScheduledPost[]) => {
     const dateMap = new Map()
 
     scheduledPosts.forEach(post => {
@@ -223,7 +242,7 @@ export default function AnalyticsDashboard() {
     return Array.from(dateMap.values())
   }
 
-  const processEngagementData = (scheduledPosts: any[]) => {
+  const processEngagementData = (scheduledPosts: ScheduledPost[]) => {
     const platformMap = new Map()
 
     scheduledPosts.forEach(post => {

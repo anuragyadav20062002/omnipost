@@ -1,7 +1,13 @@
 import { Pie, PieChart, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 
+// Define specific types for the props and data
+interface PlatformData {
+  platform: string;
+  value: number;
+}
+
 interface PlatformBreakdownChartProps {
-  data: any[]
+  data: PlatformData[];
 }
 
 export function PlatformBreakdownChart({ data }: PlatformBreakdownChartProps) {
@@ -41,4 +47,6 @@ export function PlatformBreakdownChart({ data }: PlatformBreakdownChartProps) {
     </ResponsiveContainer>
   )
 }
+
+export default PlatformBreakdownChart
 

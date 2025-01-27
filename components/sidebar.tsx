@@ -11,8 +11,18 @@ import { LayoutDashboard, History, BarChart3, Settings, Calendar, Zap } from 'lu
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { useRouter } from 'next/navigation'
 
+interface UserMetadata {
+  avatar_url?: string;
+  full_name?: string;
+}
+
+interface User {
+  user_metadata?: UserMetadata;
+  email?: string;
+}
+
 interface SidebarProps {
-  user: any
+  user: User;
 }
 
 export function Sidebar({ user }: SidebarProps) {
