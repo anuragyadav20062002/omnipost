@@ -102,6 +102,7 @@ export default function RepurposeContent() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
+    setErrors({})
 
     try {
       const { data: { user } } = await supabase.auth.getUser()
@@ -109,6 +110,7 @@ export default function RepurposeContent() {
 
       const canIncrement = await incrementUsage(user.id, 'content_repurposes')
       if (!canIncrement) {
+        setErrors(prev => ({ ...prev, usage: "You have reached your content repurpose limit for this month." }))
         toast({
           title: "Usage Limit Reached",
           description: "You have reached your content repurpose limit for this month. Please upgrade your plan to continue.",
@@ -119,10 +121,11 @@ export default function RepurposeContent() {
       }
 
       const selectedPlatforms = Object.entries(platforms)
-        .filter(([_, isSelected]) => isSelected)
-        .map(([platform, _]) => platform)
+        .filter(([platform, isSelected]) => isSelected)
+        .map(([platform]) => platform)
 
       if (selectedPlatforms.length === 0) {
+        setErrors(prev => ({ ...prev, platforms: "Please select at least one platform." }))
         toast({
           title: "Error",
           description: "Please select at least one platform.",
@@ -134,6 +137,7 @@ export default function RepurposeContent() {
 
       // Check platform-specific limits
       if (platforms.twitter && userUsage && userUsage.tweets >= (userPlan === 'pro' ? 15 : 5)) {
+        setErrors(prev => ({ ...prev, twitter: "You have reached your Twitter posts limit for this month." }))
         toast({
           title: "Usage Limit Reached",
           description: "You have reached your Twitter posts limit for this month.",
@@ -144,6 +148,7 @@ export default function RepurposeContent() {
       }
 
       if (platforms.facebook && userUsage && userUsage.facebook_posts >= (userPlan === 'pro' ? 40 : 20)) {
+        setErrors(prev => ({ ...prev, facebook: "You have reached your Facebook posts limit for this month." }))
         toast({
           title: "Usage Limit Reached",
           description: "You have reached your Facebook posts limit for this month.",
