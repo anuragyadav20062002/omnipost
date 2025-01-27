@@ -36,6 +36,7 @@ export function SchedulePosts({
   const [isSubmitting, setIsSubmitting] = useState(false) 
   const { toast } = useToast()
   const supabase = createClientComponentClient<Database>()
+  console.log("imageUrl: "+imageUrl)
 
   useEffect(() => {
     const fetchConnectedPlatforms = async () => {

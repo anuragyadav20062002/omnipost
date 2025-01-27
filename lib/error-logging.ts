@@ -21,6 +21,8 @@ export async function logError(entry: ErrorLogEntry) {
       .from('error_logs')
       .insert([entry])
 
+    console.log(data)
+
     if (error) {
       console.error('Failed to log error:', error)
     }

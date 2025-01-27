@@ -14,6 +14,7 @@ interface PlatformAnalyticsProps {
 }
 
 export function PlatformAnalytics({ platform, data, userPlan }: PlatformAnalyticsProps) {
+  console.log(platform)
   const totalPosts = data.length
   const totalEngagements = data.reduce((sum, post) => sum + post.likes + post.comments + post.shares, 0)
   const averageEngagementRate = totalPosts > 0 ? (totalEngagements / totalPosts).toFixed(2) : '0'

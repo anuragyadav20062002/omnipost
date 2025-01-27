@@ -104,6 +104,8 @@ export default function HistoryPage() {
               imageUrl: metadata?.image_url || null,
             })
 
+            console.log(data)
+
             if (error) {
               console.error(`Error scheduling for ${platform}:`, error)
               return { platform, result: "error", error }
