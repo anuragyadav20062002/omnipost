@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { createClientComponentClient, User as SupabaseUser } from "@supabase/auth-helpers-nextjs"
+import { createClientComponentClient, type User as SupabaseUser } from "@supabase/auth-helpers-nextjs"
 import { useToast } from "@/hooks/use-toast"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -15,7 +15,6 @@ import { PlatformPreviews } from "@/components/PlatformPreviews"
 import { motion, AnimatePresence } from "framer-motion"
 
 type Post = Database["public"]["Tables"]["posts"]["Row"]
-type User = Database["public"]["Tables"]["users"]["Row"]
 
 function UTCClock() {
   const [time, setTime] = useState(new Date().toUTCString())
@@ -49,29 +48,28 @@ export default function HistoryPage() {
   const { toast } = useToast()
 
   useEffect(() => {
-    const fetchUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
+    const fetchUserAndPosts = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
       if (user && user.email) {
         setUser(user)
+        await fetchPosts(user.id)
       } else {
         console.error("User not found or email is undefined")
       }
     }
 
-    fetchUser()
-    fetchPosts()
-  }, [])
+    fetchUserAndPosts()
+  }, [supabase.auth])
 
-  const fetchPosts = async () => {
+  const fetchPosts = async (userId: string) => {
     setIsLoading(true)
     try {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) throw new Error("User not found")
-
       const { data, error } = await supabase
         .from("posts")
         .select("*")
-        .eq("user_id", user.id)
+        .eq("user_id", userId)
         .order("created_at", { ascending: false })
 
       if (error) throw error
@@ -91,9 +89,6 @@ export default function HistoryPage() {
 
   const handleSchedule = async (postId: string, scheduledPosts: Record<string, string>) => {
     try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
       if (!user) throw new Error("User not authenticated")
 
       const post = posts.find((p) => p.id === postId)
