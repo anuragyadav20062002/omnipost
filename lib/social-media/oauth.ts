@@ -244,16 +244,16 @@ async function handleInstagramCallback(accessToken: string, config: OAuthConfig)
   }
 }
 
-// Define an interface for the return type of handleCallback
+// Update the HandleCallbackResponse interface to specify types for properties
 interface HandleCallbackResponse {
-  [x: string]: any;
   access_token: string;
   refresh_token?: string;
   expires_at: number;
   user_id?: string;
   page_id?: string;
   page_access_token?: string;
-  pages?: FacebookPage[];
+  pages?: FacebookPage[]; // Ensure FacebookPage is defined correctly
+  [key: string]: string | number | FacebookPage[] | undefined; // Allow additional properties with specific types
 }
 
 // Update the handleCallback function return type
