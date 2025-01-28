@@ -1,6 +1,6 @@
 import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs"
 import { cookies } from "next/headers"
-import { NextResponse } from "next/server"
+import { NextResponse, NextRequest } from "next/server"
 import { handleCallback } from "@/lib/social-media/oauth"
 import type { Database } from "@/types/database"
 
@@ -14,7 +14,7 @@ interface FacebookPage {
   access_token: string;
 }
 
-export async function GET(request: Request, { params }: { params: { platform: string } }) {
+export async function GET(request: NextRequest, { params }: { params: { platform: string } }) {
   const platform = params.platform.toLowerCase();
   
   try {

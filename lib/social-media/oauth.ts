@@ -246,6 +246,7 @@ async function handleInstagramCallback(accessToken: string, config: OAuthConfig)
 
 // Define an interface for the return type of handleCallback
 interface HandleCallbackResponse {
+  [x: string]: any;
   access_token: string;
   refresh_token?: string;
   expires_at: number;
