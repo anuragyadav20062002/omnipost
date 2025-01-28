@@ -3,13 +3,29 @@ import { Resend } from 'resend'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
+// Define a specific type for profiles
+interface Profile {
+  email: string;
+  // Add other relevant fields as necessary
+}
+
+// Define a specific type for the data field
+interface NotificationData {
+  platform?: string;
+  result?: string;
+  error?: string;
+  percentage?: number;
+  type?: string;
+  // Add other relevant fields as necessary
+}
+
 interface EmailNotification {
-  profiles: any
-  id: string
-  user_id: string
-  type: string
-  data: any
-  status: 'pending' | 'sent' | 'failed'
+  profiles: Profile; // Updated type
+  id: string;
+  user_id: string;
+  type: string;
+  data: NotificationData; // Updated type
+  status: 'pending' | 'sent' | 'failed';
 }
 
 export async function processEmailNotifications() {
@@ -63,7 +79,7 @@ export async function processEmailNotifications() {
 }
 
 export async function sendEmail(notification: EmailNotification) {
-  const templates: Record<string, (data: any) => { subject: string, html: string }> = {
+  const templates: Record<string, (data: NotificationData) => { subject: string, html: string }> = {
     post_published: (data) => ({
       subject: 'Your post has been published!',
       html: `

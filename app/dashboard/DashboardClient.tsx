@@ -37,7 +37,7 @@ interface DashboardClientProps {
   upcomingPosts: (Database['public']['Tables']['scheduled_posts']['Row'] & {
     posts: Database['public']['Tables']['posts']['Row'] | null
   })[]
-  socialAccounts: Record<string, any>
+  socialAccounts: Record<string, { expires_at: number | null; access_token: string }>
 }
 
 export default function DashboardClient({
