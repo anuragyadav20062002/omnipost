@@ -121,7 +121,7 @@ export default function RepurposeContent() {
       }
 
       const selectedPlatforms = Object.entries(platforms)
-        .filter(([platform, isSelected]) => isSelected)
+        .filter(([, isSelected]) => isSelected)
         .map(([platform]) => platform)
 
         

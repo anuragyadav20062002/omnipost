@@ -13,7 +13,7 @@ import { motion } from 'framer-motion'
 
 interface SocialPlatform {
   name: string
-  icon: any
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>
   color: string
   isAvailable: boolean
   username?: string
