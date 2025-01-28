@@ -12,11 +12,18 @@ import Link from 'next/link'
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Loader2 } from 'lucide-react'
 
+interface Profile {
+  id: string;
+  full_name: string;
+  avatar_url: string;
+  plan_type?: string; // Add other fields as necessary
+}
+
 export default function SettingsPage() {
   const [fullName, setFullName] = useState('')
   const [avatarUrl, setAvatarUrl] = useState('')
   const [isLoading, setIsLoading] = useState(true)
-  const [profile, setProfile] = useState<any>(null)
+  const [profile, setProfile] = useState<Profile | null>(null)
   const supabase = createClientComponentClient<Database>()
   const { toast } = useToast()
 
@@ -50,7 +57,7 @@ export default function SettingsPage() {
     }
 
     fetchUserProfile()
-  }, [])
+  }, [supabase, toast])
 
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault()

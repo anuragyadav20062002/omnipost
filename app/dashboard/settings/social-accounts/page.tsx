@@ -19,8 +19,15 @@ interface SocialPlatform {
   username?: string
 }
 
+interface ConnectedAccount {
+  screen_name?: string
+  name?: string
+  username?: string
+  profile_name?: string
+}
+
 export default function SocialAccountsPage() {
-  const [connectedAccounts, setConnectedAccounts] = useState<Record<string, any>>({})
+  const [connectedAccounts, setConnectedAccounts] = useState<Record<string, ConnectedAccount>>({})
   const [isLoading, setIsLoading] = useState(false)
   const supabase = createClientComponentClient<Database>()
   const { toast } = useToast()

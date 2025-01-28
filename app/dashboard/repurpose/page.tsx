@@ -44,7 +44,7 @@ export default function RepurposeContent() {
 
   useEffect(() => {
     fetchUserUsage()
-  }, [])
+  }, [fetchUserUsage])
 
   async function fetchUserUsage() {
     try {
@@ -270,8 +270,8 @@ export default function RepurposeContent() {
     setIsLoading(false)
   }
 
-  const handleUpdateSummary = (platform: string, content: string) => {
-    setSummaries(prev => ({ ...prev, [platform]: content }))
+  const handleUpdateSummary = (content: string) => {
+    setSummaries(prev => ({ ...prev, [content]: content }))
   }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
