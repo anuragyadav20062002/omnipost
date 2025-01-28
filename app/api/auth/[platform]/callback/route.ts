@@ -3,7 +3,6 @@ import { cookies } from "next/headers"
 import { NextResponse, NextRequest } from "next/server"
 import { handleCallback } from "@/lib/social-media/oauth"
 import type { Database } from "@/types/database"
-import { NextApiResponse } from "next"
 
 // Define an interface for the Facebook page object
 interface FacebookPage {
