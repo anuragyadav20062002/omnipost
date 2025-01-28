@@ -11,7 +11,6 @@ import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Twitter, Facebook, Instagram, Linkedin, LinkIcon } from 'lucide-react'
-import { toast } from 'react-hot-toast'
 
 interface DashboardClientProps {
   user: User

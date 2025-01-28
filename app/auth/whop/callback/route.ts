@@ -4,6 +4,16 @@ import { cookies } from 'next/headers'
 import axios from 'axios'
 import type { Database } from '@/types/database'
 
+// Define a type for the membership
+interface Membership {
+  status: string;
+  product: {
+    metadata: {
+      plan_type?: string;
+    };
+  };
+}
+
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url)
   const code = requestUrl.searchParams.get('code')
@@ -103,11 +113,11 @@ export async function GET(request: Request) {
       }
     })
 
-    const memberships = membershipResponse.data.data
+    const memberships: Membership[] = membershipResponse.data.data
 
     // Update user's plan based on membership
     if (memberships && memberships.length > 0) {
-      const activeMembership = memberships.find((m: any) => m.status === 'active')
+      const activeMembership = memberships.find((m) => m.status === 'active')
       if (activeMembership) {
         await supabase
           .from('profiles')

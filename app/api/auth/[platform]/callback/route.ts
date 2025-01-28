@@ -14,16 +14,6 @@ interface FacebookPage {
   access_token: string;
 }
 
-// Update the existing Page interface to be more generic if needed
-interface Page {
-  id: string;
-  instagram_account?: {
-    id: string;
-    username: string;
-  };
-  access_token: string;
-}
-
 export async function GET(request: Request, { params }: { params: { platform: string } }) {
   const platform = params.platform.toLowerCase();
   
