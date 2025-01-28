@@ -4,6 +4,17 @@ import { NextResponse } from "next/server"
 import { handleCallback } from "@/lib/social-media/oauth"
 import type { Database } from "@/types/database"
 
+// Add proper error type for platformAuth
+const platformAuth: { 
+  [key: string]: { 
+    clientId: string; 
+    clientSecret: string; 
+    redirectUri: string 
+  } 
+} = {
+  // ... existing config
+};
+
 export async function GET(request: Request, { params }: { params: { platform: string } }) {
   try {
     const platform = params.platform

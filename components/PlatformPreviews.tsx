@@ -22,6 +22,7 @@ import { useToast } from "@/hooks/use-toast"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { motion } from "framer-motion"
+import Image from 'next/image'
 
 interface PlatformPreviewsProps {
   summaries: Record<string, string>
@@ -115,7 +116,13 @@ export function PlatformPreviews({ summaries, onUpdate, image, contentLength }: 
       </div>
       <p className="mb-2 dark:text-white whitespace-pre-wrap">{content}</p>
       {image && (
-        <img src={image || "/placeholder.svg"} alt="Uploaded content" className="w-full h-auto rounded-lg mb-2" />
+        <Image
+          src={image}
+          alt="Preview"
+          width={400}
+          height={300}
+          className="rounded-lg"
+        />
       )}
       <div className="flex justify-between text-gray-500 dark:text-gray-400">
         <motion.span whileHover={{ scale: 1.1 }} className="flex items-center">
@@ -150,7 +157,13 @@ export function PlatformPreviews({ summaries, onUpdate, image, contentLength }: 
       </div>
       <p className="mb-4 dark:text-white whitespace-pre-wrap">{content}</p>
       {image ? (
-        <img src={image || "/placeholder.svg"} alt="Uploaded content" className="w-full h-auto rounded-lg mb-2" />
+        <Image
+          src={image}
+          alt="Preview"
+          width={400}
+          height={300}
+          className="rounded-lg"
+        />
       ) : (
         <div className="bg-gray-100 dark:bg-gray-800 h-40 flex items-center justify-center mb-2">
           <ImageIcon className="h-8 w-8 text-gray-400 dark:text-gray-600" />
@@ -185,10 +198,12 @@ export function PlatformPreviews({ summaries, onUpdate, image, contentLength }: 
         <p className="font-bold dark:text-white">{username.toLowerCase()}</p>
       </div>
       {image ? (
-        <img
-          src={image || "/placeholder.svg"}
-          alt="Uploaded content"
-          className="w-full h-auto aspect-square object-cover"
+        <Image
+          src={image}
+          alt="Preview"
+          width={400}
+          height={300}
+          className="rounded-lg"
         />
       ) : (
         <div className="bg-gray-100 dark:bg-gray-800 h-80 flex items-center justify-center">
@@ -239,7 +254,13 @@ export function PlatformPreviews({ summaries, onUpdate, image, contentLength }: 
       </div>
       <p className="mb-4 dark:text-white whitespace-pre-wrap">{content}</p>
       {image ? (
-        <img src={image || "/placeholder.svg"} alt="Uploaded content" className="w-full h-auto rounded-lg mb-2" />
+        <Image
+          src={image}
+          alt="Preview"
+          width={400}
+          height={300}
+          className="rounded-lg"
+        />
       ) : (
         <div className="bg-gray-100 dark:bg-gray-800 h-40 flex items-center justify-center mb-2">
           <ImageIcon className="h-8 w-8 text-gray-400 dark:text-gray-600" />

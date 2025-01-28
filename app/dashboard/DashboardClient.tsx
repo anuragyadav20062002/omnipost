@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert"
 import { User } from '@supabase/auth-helpers-nextjs'
@@ -51,11 +51,7 @@ export default function DashboardClient({
 }: DashboardClientProps) {
   const [notifications, setNotifications] = useState<Notification[]>([])
 
-  useEffect(() => {
-    checkTokenExpirations()
-  }, [socialAccounts])
-
-  const checkTokenExpirations = () => {
+  const checkTokenExpirations = useCallback(() => {
     const newNotifications: Notification[] = []
     
     if (socialAccounts) {
@@ -78,7 +74,13 @@ export default function DashboardClient({
     }
     
     setNotifications(newNotifications)
-  }
+  }, [socialAccounts])
+
+  useEffect(() => {
+    checkTokenExpirations()
+    const interval = setInterval(checkTokenExpirations, 3600000)
+    return () => clearInterval(interval)
+  }, [checkTokenExpirations])
 
   const IconComponent = {
     BarChart: BarChart,
