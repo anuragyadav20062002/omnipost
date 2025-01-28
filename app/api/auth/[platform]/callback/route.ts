@@ -4,6 +4,25 @@ import { NextResponse } from "next/server"
 import { handleCallback } from "@/lib/social-media/oauth"
 import type { Database } from "@/types/database"
 
+// Define an interface for the Facebook page object
+interface FacebookPage {
+  id: string;
+  instagram_account?: {
+    id: string;
+    username: string;
+  } | null; // Allow null for compatibility
+  access_token: string;
+}
+
+// Update the existing Page interface to be more generic if needed
+interface Page {
+  id: string;
+  instagram_account?: {
+    id: string;
+    username: string;
+  };
+  access_token: string;
+}
 
 export async function GET(request: Request, { params }: { params: { platform: string } }) {
   const platform = params.platform.toLowerCase();
@@ -74,11 +93,11 @@ export async function GET(request: Request, { params }: { params: { platform: st
       // If pages were found, also update Instagram accounts
       if (tokenData.pages && tokenData.pages.length > 0) {
         currentAccounts.instagram = tokenData.pages
-          .filter((page: any) => page.instagram_account)
-          .map((page: any) => ({
+          .filter((page: FacebookPage) => page.instagram_account)
+          .map((page: FacebookPage) => ({
             page_id: page.id,
-            instagram_account_id: page.instagram_account.id,
-            instagram_username: page.instagram_account.username,
+            instagram_account_id: page.instagram_account?.id,
+            instagram_username: page.instagram_account?.username,
             access_token: page.access_token,
           }))
       }
