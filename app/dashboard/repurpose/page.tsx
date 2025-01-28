@@ -124,6 +124,8 @@ export default function RepurposeContent() {
         .filter(([platform, isSelected]) => isSelected)
         .map(([platform]) => platform)
 
+        
+
       if (selectedPlatforms.length === 0) {
         setErrors(prev => ({ ...prev, platforms: "Please select at least one platform." }))
         toast({

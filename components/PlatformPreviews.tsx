@@ -301,7 +301,7 @@ export function PlatformPreviews({ summaries, onUpdate, image, contentLength }: 
               </TabsTrigger>
             ))}
           </TabsList>
-          {Object.entries(summaries).map(([platform, content]) => (
+          {Object.entries(summaries).map(([platform]) => (
             <TabsContent key={platform} value={platform}>
               <div className="space-y-4">
                 <Textarea

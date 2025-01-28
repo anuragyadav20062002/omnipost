@@ -89,14 +89,6 @@ export default function DashboardClient({
     TrendingUp: TrendingUp
   }
 
-  const handleDeletePost = async (postId: string) => {
-    try {
-      // ... existing code
-    } catch (error: unknown) {
-      const err = error as { message?: string };
-      toast.error(err.message || "Failed to delete post");
-    }
-  };
 
   return (
     <motion.div

@@ -10,11 +10,6 @@ import { useEffect, useState } from 'react'
 import '../styles/sparkle.css'
 
 
-interface JwtPayload {
-  name?: string;
-  email?: string;
-  picture?: string;
-}
 
 const StarIcon = ({ className }: { className?: string }) => (
   <svg
