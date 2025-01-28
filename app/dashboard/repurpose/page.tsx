@@ -43,61 +43,61 @@ export default function RepurposeContent() {
   const { toast } = useToast()
 
   useEffect(() => {
-    fetchUserUsage()
-  }, [fetchUserUsage])
+    async function fetchUserUsage() {
+      try {
+        const {
+          data: { user },
+        } = await supabase.auth.getUser()
+        if (user) {
+          let usage = await getUserUsage(user.id)
+          if (!usage) {
+            const { data, error } = await supabase
+              .from("usage_tracking")
+              .insert({
+                user_id: user.id,
+                content_repurposes: 0,
+                scheduled_posts: 0,
+                tweets: 0,
+                facebook_posts: 0,
+                reset_date: new Date().toISOString(),
+              })
+              .select()
 
-  async function fetchUserUsage() {
-    try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-      if (user) {
-        let usage = await getUserUsage(user.id)
-        if (!usage) {
-          const { data, error } = await supabase
-            .from("usage_tracking")
-            .insert({
-              user_id: user.id,
-              content_repurposes: 0,
-              scheduled_posts: 0,
-              tweets: 0,
-              facebook_posts: 0,
-              reset_date: new Date().toISOString(),
+            if (error) throw error
+            usage = data[0]
+          }
+          setUserUsage(usage)
+
+          // Fetch user's plan from the profiles table
+          const { data: profileData, error: profileError } = await supabase
+            .from("profiles")
+            .select("plan_type")
+            .eq("id", user.id)
+            .single()
+
+          if (profileError) {
+            console.error("Error fetching user profile:", profileError)
+            toast({
+              title: "Error",
+              description: "Failed to fetch user plan. Using basic plan as default.",
+              variant: "destructive",
             })
-            .select()
-        
-          if (error) throw error
-          usage = data[0]
+          } else {
+            setUserPlan(profileData.plan_type || "basic")
+          }
         }
-        setUserUsage(usage)
-
-        // Fetch user's plan from the profiles table
-        const { data: profileData, error: profileError } = await supabase
-          .from("profiles")
-          .select("plan_type")
-          .eq("id", user.id)
-          .single()
-
-        if (profileError) {
-          console.error("Error fetching user profile:", profileError)
-          toast({
-            title: "Error",
-            description: "Failed to fetch user plan. Using basic plan as default.",
-            variant: "destructive",
-          })
-        } else {
-          setUserPlan(profileData.plan_type || "basic")
-        }
+      } catch (error) {
+        console.error("Error fetching user usage:", error)
+        toast({
+          title: "Error",
+          description: "Failed to fetch usage data. Please try again.",
+          variant: "destructive",
+        })
       }
-    } catch (error) {
-      console.error("Error fetching user usage:", error)
-      toast({
-        title: "Error",
-        description: "Failed to fetch usage data. Please try again.",
-        variant: "destructive",
-      })
     }
-  }
+
+    fetchUserUsage()
+  }, [supabase, toast])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
