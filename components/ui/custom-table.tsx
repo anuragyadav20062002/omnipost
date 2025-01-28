@@ -8,7 +8,7 @@ interface Column {
 
 interface CustomTableProps {
   columns: Column[]
-  data: any[]
+  data: Record<string, string | number | boolean>[]
 }
 
 export function CustomTable({ columns, data }: CustomTableProps) {

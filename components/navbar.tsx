@@ -9,7 +9,11 @@ import { createClient } from '@/lib/supabase'
 import { useEffect, useState } from 'react'
 import '../styles/sparkle.css'
 
-
+interface User {
+  id: string
+  email?: string
+  // Add other properties as needed based on your user object structure
+}
 
 const StarIcon = ({ className }: { className?: string }) => (
   <svg
@@ -35,7 +39,7 @@ const BurstIcon = ({ className }: { className?: string }) => (
 
 export function Navbar() {
   const router = useRouter()
-  const [user, setUser] = useState<any>(null)
+  const [user, setUser] = useState<User | null>(null)
 
   useEffect(() => {
     const supabase = createClient()

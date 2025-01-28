@@ -244,13 +244,8 @@ async function handleInstagramCallback(accessToken: string, config: OAuthConfig)
   }
 }
 
-export async function handleCallback(
-  platform: string,
-  code: string,
-  userId: string,
-  codeVerifier?: string
-): Promise<{
-  [x: string]: any;
+// Define an interface for the return type of handleCallback
+interface HandleCallbackResponse {
   access_token: string;
   refresh_token?: string;
   expires_at: number;
@@ -258,8 +253,16 @@ export async function handleCallback(
   page_id?: string;
   page_access_token?: string;
   pages?: FacebookPage[];
-}> {
-  console.log(`Handling callback for ${platform}`);
+}
+
+// Update the handleCallback function return type
+export async function handleCallback(
+  platform: string,
+  code: string,
+  userId: string,
+  codeVerifier?: string
+): Promise<HandleCallbackResponse> {
+  console.log(`Handling callback for ${platform} and userid- ${userId}`);
   const config = configs[platform];
   if (!config) {
     throw new Error(`Unsupported platform: ${platform}`);

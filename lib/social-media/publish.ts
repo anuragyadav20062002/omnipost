@@ -1,6 +1,12 @@
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
 
-export async function checkAndPublishDuePosts(serverSession?: any) {
+// Define an interface for the session structure
+interface Session {
+  access_token: string;
+  // Add other properties as needed
+}
+
+export async function checkAndPublishDuePosts(serverSession?: Session) {
   console.log('Checking and publishing due posts...')
   console.log('Current time:', new Date().toISOString())
   try {

@@ -136,7 +136,7 @@ export function SchedulePosts({
             />
             {platform === "facebook" && socialAccounts?.facebook?.pages && (
               <Select
-                onValueChange={(value) =>
+                onValueChange={() =>
                   handleScheduleChange(
                     platform,
                     schedulePosts.find((post) => post.id === platform)?.scheduleTime.toISOString() || "",
