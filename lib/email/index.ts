@@ -12,13 +12,6 @@ interface EmailNotification {
   status: 'pending' | 'sent' | 'failed'
 }
 
-interface EmailOptions {
-  to: string;
-  subject: string;
-  html: string;
-  text: string;
-}
-
 export async function processEmailNotifications() {
   const supabase = createClient()
 
@@ -69,8 +62,47 @@ export async function processEmailNotifications() {
   }
 }
 
-export const sendEmail = async (options: EmailOptions) => {
-  // Ensure that the options parameter is used correctly
-  // ... existing code
+export async function sendEmail(notification: EmailNotification) {
+  const templates: Record<string, (data: any) => { subject: string, html: string }> = {
+    post_published: (data) => ({
+      subject: 'Your post has been published!',
+      html: `
+        <h1>Post Published Successfully</h1>
+        <p>Your post has been published to ${data.platform}.</p>
+        <p>${data.result}</p>
+      `
+    }),
+    post_failed: (data) => ({
+      subject: 'Post Publishing Failed',
+      html: `
+        <h1>Post Publishing Failed</h1>
+        <p>We were unable to publish your post to ${data.platform}.</p>
+        <p>Error: ${data.error}</p>
+        <p>Please try again or contact support if the problem persists.</p>
+      `
+    }),
+    usage_limit: (data) => ({
+      subject: 'Usage Limit Alert',
+      html: `
+        <h1>Usage Limit Alert</h1>
+        <p>You have reached ${data.percentage}% of your ${data.type} limit.</p>
+        <p>Consider upgrading to our Pro plan for higher limits.</p>
+      `
+    })
+  }
+
+  const template = templates[notification.type]
+  if (!template) {
+    throw new Error(`Unknown notification type: ${notification.type}`)
+  }
+
+  const { subject, html } = template(notification.data)
+
+  await resend.emails.send({
+    from: 'OmniPost <notifications@omnipost.com>',
+    to: notification.profiles.email,
+    subject,
+    html
+  })
 }
 

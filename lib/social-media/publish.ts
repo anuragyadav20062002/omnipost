@@ -53,12 +53,3 @@ export async function checkAndPublishDuePosts(serverSession?: any) {
   }
 }
 
-export const handleSocialMediaPost = async <T,>(
-  platform: string,
-  content: string,
-  options?: T
-) => {
-  // Ensure that the options parameter is used correctly
-  // ... existing code
-};
-
