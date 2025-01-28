@@ -26,17 +26,37 @@ export interface UsageTracking {
 export interface Database {
   public: {
     Tables: {
+      users: {
+        Row: {
+          id: string;
+          created_at: string;
+          email: string;
+          // Add other fields as necessary
+        };
+        Insert: {
+          id?: string;
+          created_at?: string;
+          email: string;
+          // Add other fields as necessary
+        };
+        Update: {
+          id?: string;
+          created_at?: string;
+          email?: string;
+          // Add other fields as necessary
+        };
+      };
       profiles: {
         Row: {
-          id: string
-          created_at: string
-          updated_at: string
-          email: string
-          full_name: string | null
-          avatar_url: string | null
-          social_accounts: Record<string, SocialAccount> | null
-          subscription_id: string | null
-        }
+          id: string;
+          created_at: string;
+          updated_at: string;
+          email: string;
+          full_name: string | null;
+          avatar_url: string | null;
+          social_accounts: Record<string, SocialAccount> | null;
+          subscription_id: string | null;
+        };
         Insert: {
           id: string
           created_at?: string
@@ -46,7 +66,7 @@ export interface Database {
           avatar_url?: string | null
           social_accounts?: Record<string, SocialAccount> | null
           subscription_id?: string | null
-        }
+        };
         Update: {
           id?: string
           created_at?: string
@@ -56,8 +76,8 @@ export interface Database {
           avatar_url?: string | null
           social_accounts?: Record<string, SocialAccount> | null
           subscription_id?: string | null
-        }
-      }
+        };
+      };
       analytics: {
         Row: {
           id: string
@@ -95,7 +115,7 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
-      }
+      };
       posts: {
         Row: {
           id: string
@@ -133,7 +153,7 @@ export interface Database {
           status?: 'draft' | 'scheduled' | 'published'
           metadata?: Json
         }
-      }
+      };
       scheduled_posts: {
         Row: {
           id: string
@@ -177,7 +197,7 @@ export interface Database {
           error_message?: string | null
           image_url?: string | null
         }
-      }
+      };
       subscriptions: {
         Row: {
           id: string
@@ -209,7 +229,7 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
-      }
+      };
       usage_tracking: {
         Row: {
           id: string

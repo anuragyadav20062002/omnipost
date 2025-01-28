@@ -9,8 +9,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AlertCircle, Info } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { createClientComponentClient, User as SupabaseUser } from '@supabase/auth-helpers-nextjs'
 import { Database } from '@/types/database'
+import { toast } from 'react-hot-toast'
+
+interface SchedulePost {
+  id: string;
+  content: string;
+  platforms: string[];
+  scheduleTime: Date;
+}
 
 interface SchedulePostsProps {
   summaries: Record<string, string>
@@ -19,6 +27,7 @@ interface SchedulePostsProps {
   onSchedule: (scheduledPosts: Record<string, string>) => void 
   connectedPlatforms?: string[]
   socialAccounts?: Record<string, any>
+  user: SupabaseUser; // Use the correct User type
 }
 
 export function SchedulePosts({
@@ -28,8 +37,9 @@ export function SchedulePosts({
   onSchedule,
   connectedPlatforms = [],
   socialAccounts,
+  user,
 }: SchedulePostsProps) {
-  const [scheduledPosts, setScheduledPosts] = useState<Record<string, { date: string; pageId?: string }>>({})
+  const [schedulePosts, setSchedulePosts] = useState<SchedulePost[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [availablePlatforms, setAvailablePlatforms] = useState<string[]>([])
@@ -66,10 +76,15 @@ export function SchedulePosts({
   }, [connectedPlatforms])
 
   const handleScheduleChange = (platform: string, localDate: string, pageId?: string) => {
-    setScheduledPosts(prev => ({
+    setSchedulePosts(prev => [
       ...prev,
-      [platform]: { date: localDate, pageId }
-    }))
+      {
+        id: platform,
+        content: '',
+        platforms: [platform],
+        scheduleTime: new Date(localDate)
+      }
+    ])
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -83,12 +98,9 @@ export function SchedulePosts({
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) throw new Error('User not authenticated')
 
-      const scheduledPostsData = Object.entries(scheduledPosts).map(([platform, { date }]) => {
-        // Convert local date to UTC
-        const localDate = new Date(date)
-        const utcDate = new Date(localDate.getTime() - localDate.getTimezoneOffset() * 60000)
-        return [platform, utcDate.toISOString()]
-      })
+      const scheduledPostsData = schedulePosts.map((post) => [
+        post.id, post.scheduleTime.toISOString()
+      ])
 
       onSchedule(Object.fromEntries(scheduledPostsData))
       onClose()
@@ -104,6 +116,15 @@ export function SchedulePosts({
       setIsLoading(false)
     }
   }
+
+  const handleError = (error: unknown) => {
+    const err = error as { message?: string };
+    toast({
+      title: "Error",
+      description: err.message || "Scheduling failed",
+      variant: "destructive",
+    });
+  };
 
   return (
     <form onSubmit={handleSubmit}>
@@ -130,7 +151,7 @@ export function SchedulePosts({
               <Select
                 onValueChange={(value) => handleScheduleChange(
                   platform,
-                  scheduledPosts[platform]?.date || '',
+                  schedulePosts.find(post => post.id === platform)?.scheduleTime.toISOString() || '',
                   value
                 )}
                 defaultValue={socialAccounts?.facebook?.pages[0]?.id}

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
+import { createClientComponentClient, User as SupabaseUser } from "@supabase/auth-helpers-nextjs"
 import { useToast } from "@/hooks/use-toast"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -15,6 +15,7 @@ import { PlatformPreviews } from "@/components/PlatformPreviews"
 import { motion, AnimatePresence } from "framer-motion"
 
 type Post = Database["public"]["Tables"]["posts"]["Row"]
+type User = Database["public"]["Tables"]["users"]["Row"]
 
 function UTCClock() {
   const [time, setTime] = useState(new Date().toUTCString())
@@ -43,19 +44,28 @@ export default function HistoryPage() {
   const [posts, setPosts] = useState<Post[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [expandedPost, setExpandedPost] = useState<string | null>(null)
+  const [user, setUser] = useState<SupabaseUser | null>(null)
   const supabase = createClientComponentClient<Database>()
   const { toast } = useToast()
 
   useEffect(() => {
+    const fetchUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user && user.email) {
+        setUser(user)
+      } else {
+        console.error("User not found or email is undefined")
+      }
+    }
+
+    fetchUser()
     fetchPosts()
   }, [])
 
   const fetchPosts = async () => {
     setIsLoading(true)
     try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
+      const { data: { user } } = await supabase.auth.getUser()
       if (!user) throw new Error("User not found")
 
       const { data, error } = await supabase
@@ -230,12 +240,15 @@ export default function HistoryPage() {
                           <DialogHeader>
                             <DialogTitle>Schedule Post</DialogTitle>
                           </DialogHeader>
-                          <SchedulePosts
-                            summaries={JSON.parse(post.content)}
-                            imageUrl={(post.metadata as { image_url?: string })?.image_url}
-                            onClose={() => {}}
-                            onSchedule={(scheduledPosts) => handleSchedule(post.id, scheduledPosts)}
-                          />
+                          {user && (
+                            <SchedulePosts
+                              summaries={JSON.parse(post.content)}
+                              imageUrl={(post.metadata as { image_url?: string })?.image_url}
+                              user={user}
+                              onClose={() => {}}
+                              onSchedule={(scheduledPosts) => handleSchedule(post.id, scheduledPosts)}
+                            />
+                          )}
                         </DialogContent>
                       </Dialog>
                       <Button

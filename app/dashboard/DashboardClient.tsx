@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Twitter, Facebook, Instagram, Linkedin, LinkIcon } from 'lucide-react'
+import { toast } from 'react-hot-toast'
 
 interface DashboardClientProps {
   user: User
@@ -51,7 +52,7 @@ export default function DashboardClient({
 }: DashboardClientProps) {
   const [notifications, setNotifications] = useState<Notification[]>([])
 
-  const checkTokenExpirations = useCallback(() => {
+  const checkTokenExpirations = useCallback(async () => {
     const newNotifications: Notification[] = []
     
     if (socialAccounts) {
@@ -87,6 +88,15 @@ export default function DashboardClient({
     Clock: Clock,
     TrendingUp: TrendingUp
   }
+
+  const handleDeletePost = async (postId: string) => {
+    try {
+      // ... existing code
+    } catch (error: unknown) {
+      const err = error as { message?: string };
+      toast.error(err.message || "Failed to delete post");
+    }
+  };
 
   return (
     <motion.div

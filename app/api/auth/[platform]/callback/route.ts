@@ -16,8 +16,9 @@ const platformAuth: {
 };
 
 export async function GET(request: Request, { params }: { params: { platform: string } }) {
+  const platform = params.platform.toLowerCase();
+  
   try {
-    const platform = params.platform
     const requestUrl = new URL(request.url)
 
     const code = requestUrl.searchParams.get("code")
@@ -123,12 +124,12 @@ export async function GET(request: Request, { params }: { params: { platform: st
     response.cookies.set(`${platform}_code_verifier`, "", { maxAge: 0 })
 
     return response
-  } catch (error) {
-    console.error(`Error in callback:`, error)
-    const errorMessage = error instanceof Error ? error.message : "Unknown error occurred"
-    return NextResponse.redirect(
-      new URL(`/dashboard/settings/social-accounts?error=${encodeURIComponent(errorMessage)}`, request.url),
-    )
+  } catch (err: unknown) {
+    const error = err as { message?: string; code?: string };
+    return NextResponse.json(
+      { error: error.message || "Authentication failed" },
+      { status: 500 }
+    );
   }
 }
 
