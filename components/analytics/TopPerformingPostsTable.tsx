@@ -7,14 +7,21 @@ import {
     TableRow,
   } from "@/components/ui/table"
   
+  interface PostPerformance {
+    id: string;
+    title: string;
+    engagement: number;
+    platform: string;
+  }
+  
   interface TopPerformingPostsTableProps {
-    data: any[]
+    data: PostPerformance[]
   }
   
   export function TopPerformingPostsTable({ data }: TopPerformingPostsTableProps) {
     // Sort posts by total engagements (likes + comments + shares)
     const sortedPosts = [...data].sort((a, b) => 
-      (b.likes + b.comments + b.shares) - (a.likes + a.comments + a.shares)
+      (b.engagement) - (a.engagement)
     ).slice(0, 10) // Get top 10 posts
   
     return (
@@ -23,21 +30,15 @@ import {
           <TableRow>
             <TableHead>Platform</TableHead>
             <TableHead>Content</TableHead>
-            <TableHead>Likes</TableHead>
-            <TableHead>Comments</TableHead>
-            <TableHead>Shares</TableHead>
-            <TableHead>Total Engagements</TableHead>
+            <TableHead>Engagement</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {sortedPosts.map((post, index) => (
             <TableRow key={index}>
               <TableCell>{post.platform}</TableCell>
-              <TableCell>{post.content.substring(0, 50)}...</TableCell>
-              <TableCell>{post.likes}</TableCell>
-              <TableCell>{post.comments}</TableCell>
-              <TableCell>{post.shares}</TableCell>
-              <TableCell>{post.likes + post.comments + post.shares}</TableCell>
+              <TableCell>{post.title.substring(0, 50)}...</TableCell>
+              <TableCell>{post.engagement}</TableCell>
             </TableRow>
           ))}
         </TableBody>
