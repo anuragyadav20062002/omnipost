@@ -1,48 +1,45 @@
 import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs"
 import { cookies } from "next/headers"
-import { NextResponse, NextRequest } from "next/server"
+import { NextResponse } from "next/server"
 import { handleCallback } from "@/lib/social-media/oauth"
 import type { Database } from "@/types/database"
 
 // Define an interface for the Facebook page object
 interface FacebookPage {
-  id: string;
+  id: string
   instagram_account?: {
-    id: string;
-    username: string;
-  } | null; // Allow null for compatibility
-  access_token: string;
+    id: string
+    username: string
+  } | null // Allow null for compatibility
+  access_token: string
 }
 
-export async function GET(request: NextRequest, { params }: { params: { platform: string } }) {
-  const platform = params.platform.toLowerCase();
-  
-  try {
-    const requestUrl = new URL(request.url)
+export async function GET(request: Request, { params }: { params: { platform: string } }) {
+  const platform = params.platform.toLowerCase()
 
-    const code = requestUrl.searchParams.get("code")
-    const state = requestUrl.searchParams.get("state")
-    const error = requestUrl.searchParams.get("error")
+  try {
+    const { searchParams } = new URL(request.url)
+    const code = searchParams.get("code")
+    const state = searchParams.get("state")
+    const error = searchParams.get("error")
 
     if (error || !code) {
       console.error(`${platform} auth error:`, error)
       return NextResponse.redirect(
         new URL(
           `/dashboard/settings/social-accounts?error=${encodeURIComponent(error || "No code provided")}`,
-          requestUrl.origin,
+          request.url,
         ),
       )
     }
 
-    const cookieStore = await cookies()
+    const cookieStore =await cookies()
     const storedState = cookieStore.get(`${platform}_state`)?.value
     const codeVerifier = cookieStore.get(`${platform}_code_verifier`)?.value
 
     if (!storedState || state !== storedState) {
       console.error("Invalid state")
-      return NextResponse.redirect(
-        new URL("/dashboard/settings/social-accounts?error=Invalid state", requestUrl.origin),
-      )
+      return NextResponse.redirect(new URL("/dashboard/settings/social-accounts?error=Invalid state", request.url))
     }
 
     const supabase = createRouteHandlerClient<Database>({ cookies })
@@ -115,20 +112,15 @@ export async function GET(request: NextRequest, { params }: { params: { platform
 
     console.log("Profile updated successfully")
 
-    const response = NextResponse.redirect(
-      new URL("/dashboard/settings/social-accounts?success=true", requestUrl.origin),
-    )
+    const response = NextResponse.redirect(new URL("/dashboard/settings/social-accounts?success=true", request.url))
 
     response.cookies.set(`${platform}_state`, "", { maxAge: 0 })
     response.cookies.set(`${platform}_code_verifier`, "", { maxAge: 0 })
 
     return response
   } catch (err: unknown) {
-    const error = err as { message?: string; code?: string };
-    return NextResponse.json(
-      { error: error.message || "Authentication failed" },
-      { status: 500 }
-    );
+    const error = err as { message?: string; code?: string }
+    return NextResponse.json({ error: error.message || "Authentication failed" }, { status: 500 })
   }
 }
 
