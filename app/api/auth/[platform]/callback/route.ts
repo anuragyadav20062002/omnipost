@@ -1,6 +1,6 @@
 import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs"
 import { cookies } from "next/headers"
-import type { NextApiRequest, NextApiResponse } from "next"
+import { type NextRequest, NextResponse } from "next/server"
 import { handleCallback } from "@/lib/social-media/oauth"
 import type { Database } from "@/types/database"
 
@@ -13,16 +13,22 @@ interface FacebookPage {
   access_token: string
 }
 
-export default async function GET(req: NextApiRequest, res: NextApiResponse) {
-  const { platform } = req.query as { platform: string }
+export async function GET(request: NextRequest, context: { params: { platform: string } }) {
+  const { platform } = context.params
 
   try {
-    const { code, state, error } = req.query as { code?: string; state?: string; error?: string }
+    const searchParams = request.nextUrl.searchParams
+    const code = searchParams.get("code")
+    const state = searchParams.get("state")
+    const error = searchParams.get("error")
 
     if (error || !code) {
       console.error(`${platform} auth error:`, error)
-      return res.redirect(
-        `/dashboard/settings/social-accounts?error=${encodeURIComponent(error || "No code provided")}`,
+      return NextResponse.redirect(
+        new URL(
+          `/dashboard/settings/social-accounts?error=${encodeURIComponent(error || "No code provided")}`,
+          request.url,
+        ),
       )
     }
 
@@ -32,7 +38,7 @@ export default async function GET(req: NextApiRequest, res: NextApiResponse) {
 
     if (!storedState || state !== storedState) {
       console.error("Invalid state")
-      return res.redirect("/dashboard/settings/social-accounts?error=Invalid state")
+      return NextResponse.redirect(new URL("/dashboard/settings/social-accounts?error=Invalid state", request.url))
     }
 
     const supabase = createRouteHandlerClient<Database>({ cookies })
@@ -104,14 +110,19 @@ export default async function GET(req: NextApiRequest, res: NextApiResponse) {
 
     console.log("Profile updated successfully")
 
-    res.setHeader(`${platform}_state`, "")
-    res.setHeader(`${platform}_code_verifier`, "")
+    const response = NextResponse.redirect(new URL("/dashboard/settings/social-accounts?success=true", request.url))
 
-    return res.redirect("/dashboard/settings/social-accounts?success=true")
+    response.cookies.set(`${platform}_state`, "", { maxAge: 0 })
+    response.cookies.set(`${platform}_code_verifier`, "", { maxAge: 0 })
+
+    return response
   } catch (error) {
     console.error("Error in callback:", error)
-    return res.redirect(
-      `/dashboard/settings/social-accounts?error=${encodeURIComponent((error as Error).message || "Unknown error occurred")}`,
+    return NextResponse.redirect(
+      new URL(
+        `/dashboard/settings/social-accounts?error=${encodeURIComponent((error as Error).message || "Unknown error occurred")}`,
+        request.url,
+      ),
     )
   }
 }
