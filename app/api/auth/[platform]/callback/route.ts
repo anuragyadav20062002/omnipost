@@ -1,24 +1,23 @@
 import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs"
 import { cookies } from "next/headers"
-import { NextResponse } from "next/server"
+import { type NextRequest, NextResponse } from "next/server"
 import { handleCallback } from "@/lib/social-media/oauth"
 import type { Database } from "@/types/database"
 
-// Define an interface for the Facebook page object
 interface FacebookPage {
   id: string
   instagram_account?: {
     id: string
     username: string
-  } | null // Allow null for compatibility
+  } | null
   access_token: string
 }
 
-export async function GET(request: Request, { params }: { params: { platform: string } }): Promise<NextResponse> {
+export async function GET(request: NextRequest, { params }: { params: { platform: string } }) {
   const platform = params.platform.toLowerCase()
 
   try {
-    const { searchParams } = new URL(request.url)
+    const searchParams = request.nextUrl.searchParams
     const code = searchParams.get("code")
     const state = searchParams.get("state")
     const error = searchParams.get("error")
@@ -77,7 +76,6 @@ export async function GET(request: Request, { params }: { params: { platform: st
         pages: tokenData.pages,
       }
 
-      // If pages were found, also update Instagram accounts
       if (tokenData.pages && tokenData.pages.length > 0) {
         currentAccounts.instagram = tokenData.pages
           .filter((page: FacebookPage) => page.instagram_account)
@@ -118,9 +116,14 @@ export async function GET(request: Request, { params }: { params: { platform: st
     response.cookies.set(`${platform}_code_verifier`, "", { maxAge: 0 })
 
     return response
-  } catch (err: unknown) {
-    const error = err as { message?: string; code?: string }
-    return NextResponse.json({ error: error.message || "Authentication failed" }, { status: 500 })
+  } catch (error) {
+    console.error("Error in callback:", error)
+    return NextResponse.redirect(
+      new URL(
+        `/dashboard/settings/social-accounts?error=${encodeURIComponent((error as Error).message || "Unknown error occurred")}`,
+        request.url,
+      ),
+    )
   }
 }
 
