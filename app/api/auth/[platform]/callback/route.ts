@@ -1,6 +1,6 @@
 import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs"
 import { cookies } from "next/headers"
-import { type NextRequest, NextResponse } from "next/server"
+import type { NextApiRequest, NextApiResponse } from "next"
 import { handleCallback } from "@/lib/social-media/oauth"
 import type { Database } from "@/types/database"
 
@@ -13,32 +13,26 @@ interface FacebookPage {
   access_token: string
 }
 
-export async function GET(request: NextRequest, { params }: { params: { platform: string } }) {
-  const platform = params.platform.toLowerCase()
+export default async function GET(req: NextApiRequest, res: NextApiResponse) {
+  const { platform } = req.query as { platform: string }
 
   try {
-    const searchParams = request.nextUrl.searchParams
-    const code = searchParams.get("code")
-    const state = searchParams.get("state")
-    const error = searchParams.get("error")
+    const { code, state, error } = req.query as { code?: string; state?: string; error?: string }
 
     if (error || !code) {
       console.error(`${platform} auth error:`, error)
-      return NextResponse.redirect(
-        new URL(
-          `/dashboard/settings/social-accounts?error=${encodeURIComponent(error || "No code provided")}`,
-          request.url,
-        ),
+      return res.redirect(
+        `/dashboard/settings/social-accounts?error=${encodeURIComponent(error || "No code provided")}`,
       )
     }
 
-    const cookieStore = await cookies()
+    const cookieStore =await cookies()
     const storedState = cookieStore.get(`${platform}_state`)?.value
     const codeVerifier = cookieStore.get(`${platform}_code_verifier`)?.value
 
     if (!storedState || state !== storedState) {
       console.error("Invalid state")
-      return NextResponse.redirect(new URL("/dashboard/settings/social-accounts?error=Invalid state", request.url))
+      return res.redirect("/dashboard/settings/social-accounts?error=Invalid state")
     }
 
     const supabase = createRouteHandlerClient<Database>({ cookies })
@@ -110,19 +104,14 @@ export async function GET(request: NextRequest, { params }: { params: { platform
 
     console.log("Profile updated successfully")
 
-    const response = NextResponse.redirect(new URL("/dashboard/settings/social-accounts?success=true", request.url))
+    res.setHeader(`${platform}_state`, "")
+    res.setHeader(`${platform}_code_verifier`, "")
 
-    response.cookies.set(`${platform}_state`, "", { maxAge: 0 })
-    response.cookies.set(`${platform}_code_verifier`, "", { maxAge: 0 })
-
-    return response
+    return res.redirect("/dashboard/settings/social-accounts?success=true")
   } catch (error) {
     console.error("Error in callback:", error)
-    return NextResponse.redirect(
-      new URL(
-        `/dashboard/settings/social-accounts?error=${encodeURIComponent((error as Error).message || "Unknown error occurred")}`,
-        request.url,
-      ),
+    return res.redirect(
+      `/dashboard/settings/social-accounts?error=${encodeURIComponent((error as Error).message || "Unknown error occurred")}`,
     )
   }
 }
