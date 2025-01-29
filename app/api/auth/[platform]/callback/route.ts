@@ -14,7 +14,7 @@ interface FacebookPage {
   access_token: string
 }
 
-export async function GET(request: Request, { params }: { params: { platform: string } }) {
+export async function GET(request: Request, { params }: { params: { platform: string } }): Promise<NextResponse> {
   const platform = params.platform.toLowerCase()
 
   try {
@@ -33,7 +33,7 @@ export async function GET(request: Request, { params }: { params: { platform: st
       )
     }
 
-    const cookieStore =await cookies()
+    const cookieStore = await cookies()
     const storedState = cookieStore.get(`${platform}_state`)?.value
     const codeVerifier = cookieStore.get(`${platform}_code_verifier`)?.value
 
