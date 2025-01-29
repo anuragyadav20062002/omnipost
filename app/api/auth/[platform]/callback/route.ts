@@ -13,11 +13,17 @@ interface FacebookPage {
   access_token: string
 }
 
-export async function GET(request: NextRequest, { params }: { params: { platform: string } }) {
-  const platform = params.platform.toLowerCase()
+type Props = {
+  params: {
+    platform: string
+  }
+}
+
+export async function GET(req: NextRequest, props: Props): Promise<NextResponse> {
+  const platform = props.params.platform.toLowerCase()
 
   try {
-    const searchParams = request.nextUrl.searchParams
+    const searchParams = req.nextUrl.searchParams
     const code = searchParams.get("code")
     const state = searchParams.get("state")
     const error = searchParams.get("error")
@@ -27,7 +33,7 @@ export async function GET(request: NextRequest, { params }: { params: { platform
       return NextResponse.redirect(
         new URL(
           `/dashboard/settings/social-accounts?error=${encodeURIComponent(error || "No code provided")}`,
-          request.url,
+          req.url,
         ),
       )
     }
@@ -38,7 +44,7 @@ export async function GET(request: NextRequest, { params }: { params: { platform
 
     if (!storedState || state !== storedState) {
       console.error("Invalid state")
-      return NextResponse.redirect(new URL("/dashboard/settings/social-accounts?error=Invalid state", request.url))
+      return NextResponse.redirect(new URL("/dashboard/settings/social-accounts?error=Invalid state", req.url))
     }
 
     const supabase = createRouteHandlerClient<Database>({ cookies })
@@ -110,7 +116,7 @@ export async function GET(request: NextRequest, { params }: { params: { platform
 
     console.log("Profile updated successfully")
 
-    const response = NextResponse.redirect(new URL("/dashboard/settings/social-accounts?success=true", request.url))
+    const response = NextResponse.redirect(new URL("/dashboard/settings/social-accounts?success=true", req.url))
 
     response.cookies.set(`${platform}_state`, "", { maxAge: 0 })
     response.cookies.set(`${platform}_code_verifier`, "", { maxAge: 0 })
@@ -121,7 +127,7 @@ export async function GET(request: NextRequest, { params }: { params: { platform
     return NextResponse.redirect(
       new URL(
         `/dashboard/settings/social-accounts?error=${encodeURIComponent((error as Error).message || "Unknown error occurred")}`,
-        request.url,
+        req.url,
       ),
     )
   }
