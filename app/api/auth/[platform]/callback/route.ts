@@ -13,14 +13,8 @@ interface FacebookPage {
   access_token: string
 }
 
-type Props = {
-  params: {
-    platform: string
-  }
-}
-
-export async function GET(req: NextRequest, props: Props): Promise<NextResponse> {
-  const platform = props.params.platform.toLowerCase()
+export async function GET(req: NextRequest, { params }: { params: { platform: string } }): Promise<NextResponse> {
+  const platform = params.platform.toLowerCase()
 
   try {
     const searchParams = req.nextUrl.searchParams
