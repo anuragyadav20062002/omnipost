@@ -13,8 +13,8 @@ interface FacebookPage {
   access_token: string
 }
 
-export async function GET(request: NextRequest, context: { params: { platform: string } }) {
-  const { platform } = context.params
+export async function GET(request: NextRequest, { params }: { params: { platform: string } }) {
+  const { platform } = params
 
   try {
     const searchParams = request.nextUrl.searchParams
