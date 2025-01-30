@@ -7,6 +7,7 @@ export async function middleware(req: NextRequest) {
   const supabase = createMiddlewareClient({ req, res })
   const origin = process.env.NODE_ENV === "production" ? "https://omnipost.vercel.app" : "http://localhost:3000"
 
+  // Refresh session if it exists
   const {
     data: { session },
   } = await supabase.auth.getSession()
@@ -25,6 +26,11 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/api/auth/session"],
+  matcher: [
+    "/dashboard/:path*",
+    "/api/auth/session",
+    "/api/auth/:path*",
+    "/((?!_next/static|_next/image|favicon.ico).*)",
+  ],
 }
 

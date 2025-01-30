@@ -20,35 +20,47 @@ export const authOptions: NextAuthOptions = {
       },
     }),
   ],
+  secret: process.env.NEXTAUTH_SECRET,
+  session: {
+    strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+  },
   callbacks: {
     async signIn({ user, account }) {
       if (account?.provider === "google") {
         const supabase = createClientComponentClient()
 
-        // Create or update user in Supabase
-        const { error: upsertError } = await supabase.from("users").upsert({
-          id: user.id,
-          email: user.email,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        })
+        try {
+          // Create or update user in Supabase
+          const { error: upsertError } = await supabase.from("users").upsert({
+            id: user.id,
+            email: user.email,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          })
 
-        if (upsertError) {
-          console.error("Error upserting user:", upsertError)
-          return false
-        }
+          if (upsertError) {
+            console.error("Error upserting user:", upsertError)
+            return false
+          }
 
-        // Create or update profile
-        const { error: profileError } = await supabase.from("profiles").upsert({
-          id: user.id,
-          email: user.email,
-          full_name: user.name,
-          avatar_url: user.image,
-          updated_at: new Date().toISOString(),
-        })
+          // Create or update profile
+          const { error: profileError } = await supabase.from("profiles").upsert({
+            id: user.id,
+            email: user.email,
+            full_name: user.name,
+            avatar_url: user.image,
+            updated_at: new Date().toISOString(),
+          })
 
-        if (profileError) {
-          console.error("Error upserting profile:", profileError)
+          if (profileError) {
+            console.error("Error upserting profile:", profileError)
+            return false
+          }
+
+          return true
+        } catch (error) {
+          console.error("Error in signIn callback:", error)
           return false
         }
       }
@@ -72,10 +84,6 @@ export const authOptions: NextAuthOptions = {
   pages: {
     signIn: "/auth/signin",
     error: "/auth/error",
-  },
-  secret: process.env.NEXTAUTH_SECRET,
-  session: {
-    strategy: "jwt",
   },
   debug: process.env.NODE_ENV === "development",
 }
