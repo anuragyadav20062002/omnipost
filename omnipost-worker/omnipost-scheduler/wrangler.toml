@@ -5,7 +5,7 @@ compatibility_flags = ["nodejs_compat"]
 
 [vars]
 NEXT_PUBLIC_SUPABASE_URL = "https://efiydlwnbhdcokttfifz.supabase.co"
-NEXT_PUBLIC_APP_URL = "http://localhost:3000"
+NEXT_PUBLIC_APP_URL = "https://omnipost.vercel.app"
 TWITTER_CLIENT_ID = "QWZOaFQxeXB6UVM0TkFvRkhqSE46MTpjaQ"
 TWITTER_CLIENT_SECRET = "6S_8DvYwJ92kyN9p1rL0FukDo0FsZBk7BI37F85e3CZCaj68Iz"
 
