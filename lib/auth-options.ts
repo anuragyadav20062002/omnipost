@@ -1,5 +1,10 @@
 import type { NextAuthOptions } from "next-auth"
 import GoogleProvider from "next-auth/providers/google"
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
+
+if (!process.env.NEXTAUTH_SECRET) {
+  throw new Error("NEXTAUTH_SECRET is not defined")
+}
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -16,6 +21,39 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
+    async signIn({ user, account }) {
+      if (account?.provider === "google") {
+        const supabase = createClientComponentClient()
+
+        // Create or update user in Supabase
+        const { error: upsertError } = await supabase.from("users").upsert({
+          id: user.id,
+          email: user.email,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        })
+
+        if (upsertError) {
+          console.error("Error upserting user:", upsertError)
+          return false
+        }
+
+        // Create or update profile
+        const { error: profileError } = await supabase.from("profiles").upsert({
+          id: user.id,
+          email: user.email,
+          full_name: user.name,
+          avatar_url: user.image,
+          updated_at: new Date().toISOString(),
+        })
+
+        if (profileError) {
+          console.error("Error upserting profile:", profileError)
+          return false
+        }
+      }
+      return true
+    },
     async jwt({ token, account, profile }) {
       if (account && profile) {
         token.accessToken = account.access_token
@@ -35,19 +73,10 @@ export const authOptions: NextAuthOptions = {
     signIn: "/auth/signin",
     error: "/auth/error",
   },
-  // Add these configuration options
   secret: process.env.NEXTAUTH_SECRET,
-  cookies: {
-    sessionToken: {
-      name: `next-auth.session-token`,
-      options: {
-        httpOnly: true,
-        sameSite: "lax",
-        path: "/",
-        secure: process.env.NODE_ENV === "production",
-      },
-    },
+  session: {
+    strategy: "jwt",
   },
-  debug: process.env.NODE_ENV !== "production",
+  debug: process.env.NODE_ENV === "development",
 }
 

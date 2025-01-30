@@ -12,14 +12,19 @@ export async function middleware(req: NextRequest) {
   } = await supabase.auth.getSession()
 
   // If there's no session and the user is trying to access a protected route
-  if (!session && req.nextUrl.pathname.startsWith("/dashboard")) {
-    return NextResponse.redirect(new URL("/auth/signin", origin))
+  if (
+    !session &&
+    (req.nextUrl.pathname.startsWith("/dashboard") || req.nextUrl.pathname.startsWith("/api/auth/session"))
+  ) {
+    const redirectUrl = new URL("/auth/signin", origin)
+    redirectUrl.searchParams.set("callbackUrl", req.url)
+    return NextResponse.redirect(redirectUrl)
   }
 
   return res
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*"],
+  matcher: ["/dashboard/:path*", "/api/auth/session"],
 }
 
