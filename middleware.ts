@@ -3,6 +3,11 @@ import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 
 export async function middleware(req: NextRequest) {
+  // Skip middleware for NextAuth.js routes
+  if (req.nextUrl.pathname.startsWith("/api/auth")) {
+    return NextResponse.next()
+  }
+
   const res = NextResponse.next()
   const supabase = createMiddlewareClient({ req, res })
   const origin = process.env.NODE_ENV === "production" ? "https://omnipost.vercel.app" : "http://localhost:3000"
@@ -11,11 +16,6 @@ export async function middleware(req: NextRequest) {
   const {
     data: { session },
   } = await supabase.auth.getSession()
-
-  // Exclude NextAuth.js API routes from Supabase middleware
-  if (req.nextUrl.pathname.startsWith("/api/auth")) {
-    return res
-  }
 
   // If there's no session and the user is trying to access a protected route
   if (!session && req.nextUrl.pathname.startsWith("/dashboard")) {
@@ -28,6 +28,6 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/((?!_next/static|_next/image|favicon.ico|api/auth).*)"],
+  matcher: ["/dashboard/:path*", "/((?!_next/static|_next/image|favicon.ico).*)"],
 }
 
