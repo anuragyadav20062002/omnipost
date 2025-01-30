@@ -13,6 +13,7 @@ export async function GET(request: Request) {
     const origin = process.env.NODE_ENV === "production" ? "https://omnipost.vercel.app" : "http://localhost:3000"
 
     try {
+      // Exchange code for session
       const { data, error: authError } = await supabase.auth.exchangeCodeForSession(code)
 
       if (authError || !data.user) {
@@ -25,7 +26,44 @@ export async function GET(request: Request) {
         )
       }
 
-      // Update profiles table
+      // First, ensure the users table exists and create it if it doesn't
+      const { error: tableCheckError } = await supabase.rpc("ensure_tables_exist")
+
+      if (tableCheckError) {
+        console.error("Error checking/creating tables:", tableCheckError)
+        return NextResponse.redirect(
+          new URL(
+            `/auth/error?error=database_setup_failed&details=${encodeURIComponent(tableCheckError.message)}`,
+            origin,
+          ),
+        )
+      }
+
+      // Create or update user in users table
+      const { error: userUpsertError } = await supabase.from("users").upsert(
+        {
+          id: data.user.id,
+          email: data.user.email,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          has_active_subscription: false,
+        },
+        {
+          onConflict: "id",
+        },
+      )
+
+      if (userUpsertError) {
+        console.error("Error upserting user:", userUpsertError)
+        return NextResponse.redirect(
+          new URL(
+            `/auth/error?error=user_creation_failed&details=${encodeURIComponent(userUpsertError.message)}`,
+            origin,
+          ),
+        )
+      }
+
+      // Create or update profile
       const { error: profileError } = await supabase.from("profiles").upsert(
         {
           id: data.user.id,
@@ -49,45 +87,22 @@ export async function GET(request: Request) {
         )
       }
 
-      // Check if user exists in users table
-      const { data: userData, error: userError } = await supabase
+      // Now fetch the user data to check subscription status
+      const { data: userData, error: userFetchError } = await supabase
         .from("users")
         .select("id, has_active_subscription")
         .eq("id", data.user.id)
-        .single()
+        .maybeSingle()
 
-      if (userError) {
-        console.error("Error fetching user data:", userError)
+      if (userFetchError) {
+        console.error("Error fetching user data:", userFetchError)
         return NextResponse.redirect(
-          new URL(`/auth/error?error=user_fetch_failed&details=${encodeURIComponent(userError.message)}`, origin),
+          new URL(`/auth/error?error=user_fetch_failed&details=${encodeURIComponent(userFetchError.message)}`, origin),
         )
       }
 
-      if (!userData) {
-        // User doesn't exist in users table, create a new entry
-        const { error: createUserError } = await supabase.from("users").insert({
-          id: data.user.id,
-          email: data.user.email,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        })
-
-        if (createUserError) {
-          console.error("Error creating user:", createUserError)
-          return NextResponse.redirect(
-            new URL(
-              `/auth/error?error=user_creation_failed&details=${encodeURIComponent(createUserError.message)}`,
-              origin,
-            ),
-          )
-        }
-
-        // Redirect to Whop connect page for new users
-        return NextResponse.redirect(new URL("/auth/whop-connect", origin))
-      }
-
-      // User exists, check subscription status
-      if (userData.has_active_subscription) {
+      // Redirect based on subscription status
+      if (userData?.has_active_subscription) {
         return NextResponse.redirect(new URL("/dashboard", origin))
       } else {
         return NextResponse.redirect(new URL("/auth/whop-connect", origin))
