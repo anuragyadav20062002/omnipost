@@ -6,6 +6,10 @@ if (!process.env.NEXTAUTH_SECRET) {
   throw new Error("NEXTAUTH_SECRET is not defined")
 }
 
+if (!process.env.NEXTAUTH_URL) {
+  throw new Error("NEXTAUTH_URL is not defined")
+}
+
 export const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({

@@ -12,11 +12,13 @@ export async function middleware(req: NextRequest) {
     data: { session },
   } = await supabase.auth.getSession()
 
+  // Exclude NextAuth.js API routes from Supabase middleware
+  if (req.nextUrl.pathname.startsWith("/api/auth")) {
+    return res
+  }
+
   // If there's no session and the user is trying to access a protected route
-  if (
-    !session &&
-    (req.nextUrl.pathname.startsWith("/dashboard") || req.nextUrl.pathname.startsWith("/api/auth/session"))
-  ) {
+  if (!session && req.nextUrl.pathname.startsWith("/dashboard")) {
     const redirectUrl = new URL("/auth/signin", origin)
     redirectUrl.searchParams.set("callbackUrl", req.url)
     return NextResponse.redirect(redirectUrl)
@@ -26,11 +28,6 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    "/dashboard/:path*",
-    "/api/auth/session",
-    "/api/auth/:path*",
-    "/((?!_next/static|_next/image|favicon.ico).*)",
-  ],
+  matcher: ["/dashboard/:path*", "/((?!_next/static|_next/image|favicon.ico|api/auth).*)"],
 }
 
