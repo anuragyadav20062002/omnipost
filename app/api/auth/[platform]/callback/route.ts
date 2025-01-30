@@ -13,8 +13,8 @@ interface FacebookPage {
   access_token: string
 }
 
-export async function GET(request: NextRequest, { params }: { params: { platform: string } }) {
-  const { platform } = params
+export async function GET(request: NextRequest) {
+  const platform = request.nextUrl.pathname.split('/')[4];
 
   try {
     const searchParams = request.nextUrl.searchParams
@@ -32,7 +32,7 @@ export async function GET(request: NextRequest, { params }: { params: { platform
       )
     }
 
-    const cookieStore =await cookies()
+    const cookieStore = await cookies()
     const storedState = cookieStore.get(`${platform}_state`)?.value
     const codeVerifier = cookieStore.get(`${platform}_code_verifier`)?.value
 
