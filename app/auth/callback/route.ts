@@ -17,7 +17,12 @@ export async function GET(request: Request) {
 
       if (authError || !data.user) {
         console.error("Authentication error:", authError)
-        return NextResponse.redirect(new URL("/auth/signin", origin))
+        return NextResponse.redirect(
+          new URL(
+            `/auth/error?error=authentication_failed&details=${encodeURIComponent(authError?.message || "Unknown error")}`,
+            origin,
+          ),
+        )
       }
 
       // Update profiles table
@@ -36,7 +41,12 @@ export async function GET(request: Request) {
 
       if (profileError) {
         console.error("Error updating profile:", profileError)
-        return NextResponse.redirect(new URL("/auth/error?error=profile_update_failed", origin))
+        return NextResponse.redirect(
+          new URL(
+            `/auth/error?error=profile_update_failed&details=${encodeURIComponent(profileError.message)}`,
+            origin,
+          ),
+        )
       }
 
       // Check if user exists in users table
@@ -48,7 +58,9 @@ export async function GET(request: Request) {
 
       if (userError) {
         console.error("Error fetching user data:", userError)
-        return NextResponse.redirect(new URL("/auth/error?error=user_fetch_failed", origin))
+        return NextResponse.redirect(
+          new URL(`/auth/error?error=user_fetch_failed&details=${encodeURIComponent(userError.message)}`, origin),
+        )
       }
 
       if (!userData) {
@@ -62,7 +74,12 @@ export async function GET(request: Request) {
 
         if (createUserError) {
           console.error("Error creating user:", createUserError)
-          return NextResponse.redirect(new URL("/auth/error?error=user_creation_failed", origin))
+          return NextResponse.redirect(
+            new URL(
+              `/auth/error?error=user_creation_failed&details=${encodeURIComponent(createUserError.message)}`,
+              origin,
+            ),
+          )
         }
 
         // Redirect to Whop connect page for new users
@@ -77,7 +94,9 @@ export async function GET(request: Request) {
       }
     } catch (error) {
       console.error("Error in callback:", error)
-      return NextResponse.redirect(new URL("/auth/error?error=callback_error", origin))
+      return NextResponse.redirect(
+        new URL(`/auth/error?error=callback_error&details=${encodeURIComponent((error as Error).message)}`, origin),
+      )
     }
   }
 
