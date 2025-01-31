@@ -86,8 +86,41 @@ export async function POST(request: Request) {
   }
 }
 
-// Also handle GET requests for initial setup verification
-export async function GET() {
+// Handle GET requests for checkout callback
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url)
+  const secret = searchParams.get("secret")
+  const origin = "https://omnipost.vercel.app"
+
+  // If this is a checkout callback
+  if (secret) {
+    try {
+      // Verify the checkout was successful
+      const response = await fetch("https://api.whop.com/api/v2/checkout/validate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${process.env.WHOP_API_KEY}`,
+        },
+        body: JSON.stringify({
+          checkout_id: secret,
+        }),
+      })
+
+      if (!response.ok) {
+        console.error("Failed to validate checkout:", await response.text())
+        return NextResponse.redirect(new URL("/auth/error?error=checkout_validation_failed", origin))
+      }
+
+      // Redirect to dashboard after successful checkout
+      return NextResponse.redirect(new URL("/dashboard", origin))
+    } catch (error) {
+      console.error("Error processing checkout callback:", error)
+      return NextResponse.redirect(new URL("/auth/error?error=checkout_callback_failed", origin))
+    }
+  }
+
+  // Default response for webhook verification
   return new NextResponse("Webhook endpoint is working", { status: 200 })
 }
 
