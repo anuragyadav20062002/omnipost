@@ -5,17 +5,15 @@ import { cookies } from "next/headers"
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const code = searchParams.get("code")
+  const origin = process.env.NEXT_PUBLIC_APP_URL || new URL(request.url).origin
 
   if (!code) {
-    return NextResponse.redirect(new URL("/auth/error?error=missing_code", request.url))
+    return NextResponse.redirect(new URL("/auth/error?error=missing_code", origin))
   }
 
   if (!process.env.NEXT_PUBLIC_WHOP_CLIENT_ID || !process.env.WHOP_CLIENT_SECRET) {
-    return NextResponse.redirect(new URL("/auth/error?error=missing_env_vars", request.url))
+    return NextResponse.redirect(new URL("/auth/error?error=missing_env_vars", origin))
   }
-
-  const origin = new URL(request.url).origin
-  const redirectUri = `${origin}/api/auth/whop-callback`
 
   try {
     // Exchange code for token
@@ -29,11 +27,12 @@ export async function GET(request: Request) {
         client_secret: process.env.WHOP_CLIENT_SECRET,
         code,
         grant_type: "authorization_code",
-        redirect_uri: redirectUri,
+        redirect_uri: `${origin}/api/auth/whop-callback`,
       }),
     })
 
     if (!tokenResponse.ok) {
+      console.error("Token exchange failed:", await tokenResponse.text())
       throw new Error("Failed to exchange code for token")
     }
 
@@ -47,6 +46,7 @@ export async function GET(request: Request) {
     })
 
     if (!userResponse.ok) {
+      console.error("User data fetch failed:", await userResponse.text())
       throw new Error("Failed to fetch Whop user data")
     }
 
@@ -85,27 +85,23 @@ export async function GET(request: Request) {
       throw updateError
     }
 
-    // Fetch the updated user data
-    const { data: updatedUser, error: fetchError } = await supabase
-      .from("users")
-      .select("has_active_subscription")
-      .eq("id", user.id)
-      .single()
+    // Redirect to dashboard or checkout based on subscription status
+    const { data: membership } = await fetch("https://api.whop.com/api/v2/me/has_access", {
+      headers: {
+        Authorization: `Bearer ${tokenData.access_token}`,
+      },
+    }).then((res) => res.json())
 
-    if (fetchError) {
-      console.error("Error fetching updated user data:", fetchError)
-      throw fetchError
-    }
+    const hasAccess = membership?.has_access || false
 
-    // Redirect based on subscription status
-    if (updatedUser?.has_active_subscription) {
-      return NextResponse.redirect(new URL("/dashboard", request.url))
+    if (hasAccess) {
+      return NextResponse.redirect(new URL("/dashboard", origin))
     } else {
-      return NextResponse.redirect(new URL("/checkout", request.url))
+      return NextResponse.redirect(new URL("/checkout", origin))
     }
   } catch (error) {
     console.error("Error in Whop callback:", error)
-    return NextResponse.redirect(new URL("/auth/error?error=whop_callback_failed", request.url))
+    return NextResponse.redirect(new URL("/auth/error?error=whop_callback_failed", origin))
   }
 }
 
