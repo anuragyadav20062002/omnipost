@@ -8,6 +8,7 @@ export async function GET() {
 
   // Fetch the list of enabled auth providers from Supabase
   const { data, error } = await supabase.auth.getSession()
+  console.log(data)
 
   if (error) {
     console.error("Error fetching auth providers:", error)
