@@ -11,6 +11,9 @@ const supabaseAdmin = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, proces
   },
 })
 
+// Hardcode the production URL
+const PRODUCTION_URL = "https://omnipost.vercel.app"
+
 export async function POST(request: Request) {
   const headersList = await headers()
   const whopSignature = headersList.get("whop-signature")
@@ -86,11 +89,9 @@ export async function POST(request: Request) {
   }
 }
 
-// Handle GET requests for checkout callback
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const secret = searchParams.get("secret")
-  const origin = "https://omnipost.vercel.app"
 
   // If this is a checkout callback
   if (secret) {
@@ -109,14 +110,14 @@ export async function GET(request: Request) {
 
       if (!response.ok) {
         console.error("Failed to validate checkout:", await response.text())
-        return NextResponse.redirect(new URL("/auth/error?error=checkout_validation_failed", origin))
+        return NextResponse.redirect(`${PRODUCTION_URL}/auth/error?error=checkout_validation_failed`)
       }
 
       // Redirect to dashboard after successful checkout
-      return NextResponse.redirect(new URL("/dashboard", origin))
+      return NextResponse.redirect(`${PRODUCTION_URL}/dashboard`)
     } catch (error) {
       console.error("Error processing checkout callback:", error)
-      return NextResponse.redirect(new URL("/auth/error?error=checkout_callback_failed", origin))
+      return NextResponse.redirect(`${PRODUCTION_URL}/auth/error?error=checkout_callback_failed`)
     }
   }
 
