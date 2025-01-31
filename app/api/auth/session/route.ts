@@ -1,34 +1,15 @@
-import { getServerSession } from "next-auth/next"
+import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs"
+import { cookies } from "next/headers"
 import { NextResponse } from "next/server"
-import { authOptions } from "@/lib/auth-options"
 
-export async function GET() {
-  try {
-    const session = await getServerSession(authOptions)
+export async function GET(req: Request) {
+  const cookieStore = cookies()
+  const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
 
-    if (!session) {
-      return NextResponse.json(
-        {
-          authenticated: false,
-          session: null,
-        },
-        { status: 401 },
-      )
-    }
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
 
-    return NextResponse.json({
-      authenticated: true,
-      session,
-    })
-  } catch (error) {
-    console.error("Session error:", error)
-    return NextResponse.json(
-      {
-        error: "Failed to get session",
-        details: error instanceof Error ? error.message : "Unknown error",
-      },
-      { status: 500 },
-    )
-  }
+  return NextResponse.json({ session })
 }
 
