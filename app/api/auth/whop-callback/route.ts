@@ -5,7 +5,9 @@ import { cookies } from "next/headers"
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const code = searchParams.get("code")
-  const origin = process.env.NEXT_PUBLIC_APP_URL || new URL(request.url).origin
+
+  // Force the origin to be the Vercel deployment URL
+  const origin = "https://omnipost.vercel.app"
 
   if (!code) {
     return NextResponse.redirect(new URL("/auth/error?error=missing_code", origin))
@@ -94,6 +96,7 @@ export async function GET(request: Request) {
 
     const hasAccess = membership?.has_access || false
 
+    // Ensure redirects use the correct origin
     if (hasAccess) {
       return NextResponse.redirect(new URL("/dashboard", origin))
     } else {
