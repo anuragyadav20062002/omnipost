@@ -87,7 +87,7 @@ export async function POST(request: Request) {
 }
 
 // Also handle GET requests for initial setup verification
-export async function GET(request: Request) {
+export async function GET() {
   return new NextResponse("Webhook endpoint is working", { status: 200 })
 }
 
