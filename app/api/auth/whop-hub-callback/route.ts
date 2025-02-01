@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
-import { headers } from "next/headers"
-import crypto from "crypto"
 
 // Initialize Supabase admin client with service role key
 const supabaseAdmin = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, {
@@ -14,80 +12,7 @@ const supabaseAdmin = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, proces
 // Hardcode the production URL
 const PRODUCTION_URL = "https://omnipost.vercel.app"
 
-export async function POST(request: Request) {
-  const headersList = await headers()
-  const whopSignature = headersList.get("whop-signature")
-
-  if (!whopSignature) {
-    console.error("No Whop signature found")
-    return new NextResponse("Unauthorized", { status: 401 })
-  }
-
-  try {
-    // Get the raw body
-    const rawBody = await request.text()
-
-    // Verify Whop webhook signature
-    const hmac = crypto.createHmac("sha256", process.env.WHOP_CLIENT_SECRET!)
-    hmac.update(rawBody)
-    const computedSignature = hmac.digest("hex")
-
-    if (computedSignature !== whopSignature) {
-      console.error("Invalid Whop signature")
-      return new NextResponse("Invalid signature", { status: 401 })
-    }
-
-    // Parse the webhook payload
-    const payload = JSON.parse(rawBody)
-
-    // Handle different webhook events
-    switch (payload.event) {
-      case "membership.went_valid":
-      case "membership.created":
-      case "membership.renewed": {
-        // Update user's subscription status to true
-        const { error: updateError } = await supabaseAdmin
-          .from("users")
-          .update({
-            has_active_subscription: true,
-            updated_at: new Date().toISOString(),
-          })
-          .eq("whop_id", payload.data.user.id)
-
-        if (updateError) {
-          console.error("Error updating user subscription:", updateError)
-          return new NextResponse("Error updating subscription", { status: 500 })
-        }
-        break
-      }
-      case "membership.expired":
-      case "membership.cancelled":
-      case "membership.went_invalid": {
-        // Update user's subscription status to false
-        const { error: updateError } = await supabaseAdmin
-          .from("users")
-          .update({
-            has_active_subscription: false,
-            updated_at: new Date().toISOString(),
-          })
-          .eq("whop_id", payload.data.user.id)
-
-        if (updateError) {
-          console.error("Error updating user subscription:", updateError)
-          return new NextResponse("Error updating subscription", { status: 500 })
-        }
-        break
-      }
-      default:
-        console.log("Unhandled webhook event:", payload.event)
-    }
-
-    return new NextResponse("Webhook processed", { status: 200 })
-  } catch (error) {
-    console.error("Error processing webhook:", error)
-    return new NextResponse("Internal server error", { status: 500 })
-  }
-}
+// Remove the POST handler as we're no longer using webhooks
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
@@ -113,6 +38,23 @@ export async function GET(request: Request) {
         return NextResponse.redirect(`${PRODUCTION_URL}/auth/error?error=checkout_validation_failed`)
       }
 
+      // Checkout was successful, update user's subscription status
+      const checkoutData = await response.json()
+      if (checkoutData.valid) {
+        const { error: updateError } = await supabaseAdmin
+          .from("users")
+          .update({
+            has_active_subscription: true,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("whop_id", checkoutData.user.id)
+
+        if (updateError) {
+          console.error("Error updating user subscription:", updateError)
+          return NextResponse.redirect(`${PRODUCTION_URL}/auth/error?error=subscription_update_failed`)
+        }
+      }
+
       // Redirect to dashboard after successful checkout
       return NextResponse.redirect(`${PRODUCTION_URL}/dashboard`)
     } catch (error) {
@@ -121,7 +63,7 @@ export async function GET(request: Request) {
     }
   }
 
-  // Default response for webhook verification
-  return new NextResponse("Webhook endpoint is working", { status: 200 })
+  // Default response for endpoint verification
+  return new NextResponse("Checkout callback endpoint is working", { status: 200 })
 }
 
