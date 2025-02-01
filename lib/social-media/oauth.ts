@@ -38,7 +38,7 @@ const configs: Record<string, OAuthConfig> = {
   twitter: {
     clientId: process.env.TWITTER_CLIENT_ID!,
     clientSecret: process.env.TWITTER_CLIENT_SECRET!,
-    redirectUri: `https://omnipost.vercel.app/api/auth/twitter/callback`,
+    redirectUri: `https://omnipost.vercel.app/api/auth/twitter`,
     authorizationUrl: 'https://twitter.com/i/oauth2/authorize',
     tokenUrl: 'https://api.twitter.com/2/oauth2/token',
     scope: 'tweet.read tweet.write users.read offline.access',
@@ -47,7 +47,7 @@ const configs: Record<string, OAuthConfig> = {
   facebook: {
     clientId: process.env.FACEBOOK_APP_ID!,
     clientSecret: process.env.FACEBOOK_APP_SECRET!,
-    redirectUri: `https://omnipost.vercel.app/api/auth/facebook/callback`,
+    redirectUri: `https://omnipost.vercel.app/api/auth/facebook`,
     authorizationUrl: 'https://www.facebook.com/v17.0/dialog/oauth',
     tokenUrl: 'https://graph.facebook.com/v17.0/oauth/access_token',
     scope: 'pages_show_list,pages_read_engagement,pages_manage_posts,pages_manage_metadata,public_profile,email',
