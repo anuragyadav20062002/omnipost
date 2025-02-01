@@ -17,9 +17,10 @@ const PRODUCTION_URL = "https://omnipost.vercel.app"
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const secret = searchParams.get("secret")
+  const checkoutId = searchParams.get("checkout_id")
 
-  // If this is a checkout callback
-  if (secret) {
+  // If this is a checkout callback (either from secret or checkout_id)
+  if (secret || checkoutId) {
     try {
       // Verify the checkout was successful
       const response = await fetch("https://api.whop.com/api/v2/checkout/validate", {
@@ -29,7 +30,7 @@ export async function GET(request: Request) {
           Authorization: `Bearer ${process.env.WHOP_API_KEY}`,
         },
         body: JSON.stringify({
-          checkout_id: secret,
+          checkout_id: secret || checkoutId,
         }),
       })
 
@@ -63,7 +64,7 @@ export async function GET(request: Request) {
     }
   }
 
-  // Default response for endpoint verification
-  return new NextResponse("Checkout callback endpoint is working", { status: 200 })
+  // If no secret or checkout_id is provided, redirect to the homepage
+  return NextResponse.redirect(PRODUCTION_URL)
 }
 
