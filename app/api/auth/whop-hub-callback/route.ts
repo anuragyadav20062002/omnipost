@@ -1,44 +1,56 @@
 import { NextResponse } from "next/server"
-import { createClient } from "@supabase/supabase-js"
-
-// Initialize Supabase admin client with service role key
-const supabaseAdmin = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, {
-  auth: {
-    autoRefreshToken: false,
-    persistSession: false,
-  },
-})
+import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs"
+import { cookies } from "next/headers"
 
 // Hardcode the production URL
 const PRODUCTION_URL = "https://omnipost.vercel.app"
 
 export async function GET(request: Request) {
-  try {
-    // Get the current user's session
-    const { searchParams } = new URL(request.url)
-    const userId = searchParams.get("user_id")
+  const { searchParams } = new URL(request.url)
+  const secret = searchParams.get("secret")
 
-    if (userId) {
-      // Update user's subscription status to true
-      const { error: updateError } = await supabaseAdmin
+  // If this is a checkout callback
+  if (secret) {
+    // Store the checkout completion in cookies
+    const cookieStore =await cookies()
+    cookieStore.set("whop_checkout_completed", "true", {
+      path: "/",
+      secure: true,
+      sameSite: "lax",
+      maxAge: 3600, // 1 hour expiry
+    })
+  }
+
+  try {
+    // Check if user is authenticated
+    const supabase = createRouteHandlerClient({ cookies })
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
+    if (user) {
+      // User is authenticated, update their subscription status
+      const { error: updateError } = await supabase
         .from("users")
         .update({
           has_active_subscription: true,
           updated_at: new Date().toISOString(),
         })
-        .eq("id", userId)
+        .eq("id", user.id)
 
       if (updateError) {
         console.error("Error updating subscription status:", updateError)
       }
-    }
 
-    // Always redirect to dashboard, regardless of any parameters or validation
-    return NextResponse.redirect(`${PRODUCTION_URL}/dashboard`)
+      // Redirect to dashboard
+      return NextResponse.redirect(`${PRODUCTION_URL}/dashboard`)
+    } else {
+      // User is not authenticated, redirect to sign in
+      return NextResponse.redirect(`${PRODUCTION_URL}/auth/signin`)
+    }
   } catch (error) {
     console.error("Error in whop-hub-callback:", error)
-    // Even if there's an error, redirect to dashboard
-    return NextResponse.redirect(`${PRODUCTION_URL}/dashboard`)
+    return NextResponse.redirect(`${PRODUCTION_URL}/auth/signin`)
   }
 }
 

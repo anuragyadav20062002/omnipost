@@ -12,6 +12,9 @@ export async function GET(request: Request) {
     const supabase = createRouteHandlerClient<Database>({ cookies: () => cookieStore })
     const origin = "https://omnipost.vercel.app"
 
+    // Check if user completed checkout
+    const checkoutCompleted = (await cookieStore).get("whop_checkout_completed")?.value === "true"
+
     try {
       // Exchange code for session
       const { data, error: authError } = await supabase.auth.exchangeCodeForSession(code)
@@ -39,14 +42,14 @@ export async function GET(request: Request) {
         )
       }
 
-      // Create or update user in users table
+      // Create or update user in users table with subscription status from checkout
       const { error: userUpsertError } = await supabase.from("users").upsert(
         {
           id: data.user.id,
           email: data.user.email,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
-          has_active_subscription: false,
+          has_active_subscription: checkoutCompleted ? true : false, // Set based on checkout status
         },
         {
           onConflict: "id",
@@ -87,6 +90,11 @@ export async function GET(request: Request) {
         )
       }
 
+      // Clear the checkout completion cookie if it exists
+      if (checkoutCompleted) {
+        (await cookieStore).delete("whop_checkout_completed")
+      }
+
       // Now fetch the user data to check subscription status
       const { data: userData, error: userFetchError } = await supabase
         .from("users")
@@ -102,7 +110,7 @@ export async function GET(request: Request) {
       }
 
       // Redirect based on subscription status
-      if (userData?.has_active_subscription) {
+      if (userData?.has_active_subscription || checkoutCompleted) {
         return NextResponse.redirect(new URL("/dashboard", origin))
       } else {
         return NextResponse.redirect(new URL("/auth/whop-connect", origin))
