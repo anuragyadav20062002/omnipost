@@ -23,10 +23,6 @@ export default function SignIn() {
         provider: "google",
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
-          queryParams: {
-            // Pass checkout status to callback
-            checkout_completed: isCheckoutCompleted ? "true" : "false",
-          },
         },
       })
       if (error) throw error

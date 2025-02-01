@@ -29,45 +29,23 @@ export async function GET(request: Request) {
         )
       }
 
-      // First, ensure the users table exists and create it if it doesn't
-      const { error: tableCheckError } = await supabase.rpc("ensure_tables_exist")
-
-      if (tableCheckError) {
-        console.error("Error checking/creating tables:", tableCheckError)
-        return NextResponse.redirect(
-          new URL(
-            `/auth/error?error=database_setup_failed&details=${encodeURIComponent(tableCheckError.message)}`,
-            origin,
-          ),
-        )
-      }
+      // Ensure the users table exists and create it if it doesn't
+      await supabase.rpc("ensure_tables_exist")
 
       // Create or update user in users table with subscription status from checkout
-      const { error: userUpsertError } = await supabase.from("users").upsert(
+      await supabase.from("users").upsert(
         {
           id: data.user.id,
           email: data.user.email,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
-          has_active_subscription: checkoutCompleted ? true : false, // Set based on checkout status
+          has_active_subscription: checkoutCompleted,
         },
-        {
-          onConflict: "id",
-        },
+        { onConflict: "id" },
       )
 
-      if (userUpsertError) {
-        console.error("Error upserting user:", userUpsertError)
-        return NextResponse.redirect(
-          new URL(
-            `/auth/error?error=user_creation_failed&details=${encodeURIComponent(userUpsertError.message)}`,
-            origin,
-          ),
-        )
-      }
-
       // Create or update profile
-      const { error: profileError } = await supabase.from("profiles").upsert(
+      await supabase.from("profiles").upsert(
         {
           id: data.user.id,
           email: data.user.email,
@@ -75,42 +53,16 @@ export async function GET(request: Request) {
           avatar_url: data.user.user_metadata?.avatar_url,
           updated_at: new Date().toISOString(),
         },
-        {
-          onConflict: "id",
-        },
+        { onConflict: "id" },
       )
-
-      if (profileError) {
-        console.error("Error updating profile:", profileError)
-        return NextResponse.redirect(
-          new URL(
-            `/auth/error?error=profile_update_failed&details=${encodeURIComponent(profileError.message)}`,
-            origin,
-          ),
-        )
-      }
 
       // Clear the checkout completion cookie if it exists
       if (checkoutCompleted) {
         (await cookieStore).delete("whop_checkout_completed")
       }
 
-      // Now fetch the user data to check subscription status
-      const { data: userData, error: userFetchError } = await supabase
-        .from("users")
-        .select("id, has_active_subscription")
-        .eq("id", data.user.id)
-        .maybeSingle()
-
-      if (userFetchError) {
-        console.error("Error fetching user data:", userFetchError)
-        return NextResponse.redirect(
-          new URL(`/auth/error?error=user_fetch_failed&details=${encodeURIComponent(userFetchError.message)}`, origin),
-        )
-      }
-
       // Redirect based on subscription status
-      if (userData?.has_active_subscription || checkoutCompleted) {
+      if (checkoutCompleted) {
         return NextResponse.redirect(new URL("/dashboard", origin))
       } else {
         return NextResponse.redirect(new URL("/auth/whop-connect", origin))
