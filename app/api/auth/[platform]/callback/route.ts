@@ -14,7 +14,7 @@ interface FacebookPage {
 }
 
 export async function GET(request: NextRequest) {
-  const platform = request.nextUrl.pathname.split('/')[4];
+  const platform = request.nextUrl.pathname.split("/")[3];
 
   try {
     const searchParams = request.nextUrl.searchParams
