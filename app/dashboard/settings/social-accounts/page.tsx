@@ -97,33 +97,9 @@ export default function SocialAccountsPage() {
   const connectOrRefreshAccount = async (platform: string) => {
     setIsLoading(true)
     try {
-      let url = `/api/auth/${platform}`
-      
-      // Special handling for Instagram
-      if (platform === 'instagram') {
-        url = `/api/auth/instagram`
-      }
-
-      const response = await fetch(url)
-      const data = await response.json()
-
-      if (data.error) {
-        console.error(`Error connecting/refreshing ${platform} account:`, data.error)
-        throw new Error(data.error)
-      }
-
-      // Store state and code verifier in cookies
-      if (data.state) {
-        document.cookie = `${platform}_state=${data.state}; path=/; max-age=3600; secure; samesite=lax`
-      }
-      if (data.codeVerifier) {
-        document.cookie = `${platform}_code_verifier=${data.codeVerifier}; path=/; max-age=3600; secure; samesite=lax`
-      }
-
-      console.log(`Redirecting to ${platform} auth URL:`, data.url)
-      window.location.href = data.url
+      window.location.href = `/api/auth/${platform}`
     } catch (error) {
-      console.error('Error connecting/refreshing account:', error)
+      console.error("Error connecting/refreshing account:", error)
       toast({
         title: "Error",
         description: `Failed to connect/refresh ${platform} account. Please try again.`,
