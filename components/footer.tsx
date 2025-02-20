@@ -6,7 +6,7 @@ export function Footer() {
     <footer className="py-8 px-4 sm:px-6 lg:px-8 border-t border-primary/20">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center">
         <div className="text-sm text-muted-foreground mb-4 md:mb-0">
-          © 2023 OmniPost. All rights reserved.
+          © 2025 OmniPost. All rights reserved.
         </div>
         <div className="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-4">
           <Link href="/terms" className="text-sm text-muted-foreground hover:text-primary transition-colors">

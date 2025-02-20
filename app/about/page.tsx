@@ -27,7 +27,7 @@ export default function AboutPage() {
           </CardHeader>
           <CardContent>
             <p>
-              Founded in 2023, OmniPost was born out of the need for a more streamlined approach to multi-platform
+              Founded in 2025, OmniPost was born out of the need for a more streamlined approach to multi-platform
               content distribution. Our team of passionate developers and social media experts came together to create a
               solution that saves time and maximizes impact.
             </p>
